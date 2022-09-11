@@ -11,7 +11,7 @@ OBJS := $(SOURCE:.c=.o)
 # Nombre del ejecutable
 EXEC := main
 
-default: cleanAll compile run
+default: cleanAll compile clean run
 	clear
 
 compile: $(EXEC)
