@@ -1,7 +1,7 @@
 # Compilador
 CC := gcc
 # Flags de compilación
-CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c99 -Wall -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
+CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
 # Archivos.h
 HEADERS :=
 # Archivo main
