@@ -5,7 +5,7 @@ CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c99 -Wall -lSDL2_image 
 # Archivos.h
 HEADERS :=
 # Archivo main
-SOURCE := prueba.c
+SOURCE := main.c
 # Archivos.o
 OBJS := $(SOURCE:.c=.o)
 # Nombre del ejecutable
