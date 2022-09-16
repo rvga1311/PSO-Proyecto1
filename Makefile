@@ -1,7 +1,7 @@
 # Compilador
 CC := gcc
 # Flags de compilación
-CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
+CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lSDL2_ttf -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
 # Archivos.h
 HEADERS :=
 # Archivo main
@@ -17,7 +17,7 @@ default: cleanAll compile clean run
 compile: $(EXEC)
 
 $(EXEC): $(OBJS) $(HEADERS) Makefile
-	$(CC) -o $@ $(OBJS) $(CFLAGS)
+	$(CC) -o $@ $(OBJS) $(CFLAGS) $(TFFLAGS)
 
 clean:
 	rm -f $(OBJS)

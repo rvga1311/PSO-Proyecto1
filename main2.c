@@ -1,16 +1,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_ttf.h>
 
 #define ROOM_SIZE 33
 #define PLAYER_SIZE 30
-#define ATTACK_P_SIZE 50
 
 SDL_Renderer *rend;
 SDL_Surface *surface;
-TTF_Font *font;
-char text[5];
 
 struct player
 {
@@ -20,8 +16,6 @@ struct player
     SDL_Rect hitbox;
     int positions_Num;
     int positions[30][2];
-    int attack_points;
-    int health_points;
 };
 
 struct player player1;
@@ -152,11 +146,6 @@ int main(int argc, char *argv[])
     int size = 10;
     struct room rooms[size];
 
-    TTF_Init();
-
-    font = TTF_OpenFont("Montserrat-Regular.ttf", 20);
-    SDL_Color WhiteFont = {255, 255, 255};
-
     // returns zero on success else non-zero
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -165,7 +154,7 @@ int main(int argc, char *argv[])
     SDL_Window *win = SDL_CreateWindow("GAME", // creates a window
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       size * ROOM_SIZE, (size * ROOM_SIZE) + ATTACK_P_SIZE, 0);
+                                       size * ROOM_SIZE, size * ROOM_SIZE, 0);
     SDL_SetWindowResizable(win, SDL_FALSE);
 
     // triggers the program that controls
@@ -179,57 +168,7 @@ int main(int argc, char *argv[])
     player1.hitbox.x = 0;
     player1.hitbox.y = 0;
     player1.positions_Num = size;
-    player1.health_points = 5;
-    player1.attack_points = 2;
     drawMap(size, rooms);
-
-    // Icono de espada
-    SDL_Surface *attack_Icon_Surface = IMG_Load("./Images/sword.png");
-    SDL_Texture *attack_Icon_Texture = SDL_CreateTextureFromSurface(rend, attack_Icon_Surface);
-    SDL_FreeSurface(attack_Icon_Surface);
-    SDL_Rect attack_Icon_Rect;
-    SDL_QueryTexture(attack_Icon_Texture, NULL, NULL, &attack_Icon_Rect.w, &attack_Icon_Rect.h);
-    attack_Icon_Rect.w = ATTACK_P_SIZE;
-    attack_Icon_Rect.h = ATTACK_P_SIZE;
-    attack_Icon_Rect.x = 0;
-    attack_Icon_Rect.y = size * ROOM_SIZE;
-    SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect);
-
-    // Puntos de ataque
-    sprintf(text, "%d", player1.attack_points);
-    SDL_Surface *attack_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
-    SDL_Texture *attack_Text_Texture = SDL_CreateTextureFromSurface(rend, attack_Text_Surface);
-    SDL_FreeSurface(attack_Text_Surface);
-    SDL_Rect attack_Text_Texture_rect;                                   // create a rect
-    attack_Text_Texture_rect.x = attack_Icon_Rect.x + ATTACK_P_SIZE + 5; // controls the rect's x coordinate
-    attack_Text_Texture_rect.y = attack_Icon_Rect.y + 10;                // controls the rect's y coordinte
-    attack_Text_Texture_rect.w = ATTACK_P_SIZE - 10;                     // controls the width of the rect
-    attack_Text_Texture_rect.h = ATTACK_P_SIZE - 10;                     // controls the height of the rect
-    SDL_RenderCopy(rend, attack_Text_Texture, NULL, &attack_Text_Texture_rect);
-
-    // Icono de vida
-    SDL_Surface *health_Icon_Surface = IMG_Load("./Images/heart.png");
-    SDL_Texture *health_Icon_Texture = SDL_CreateTextureFromSurface(rend, health_Icon_Surface);
-    SDL_FreeSurface(health_Icon_Surface);
-    SDL_Rect health_Icon_Rect;
-    SDL_QueryTexture(health_Icon_Texture, NULL, NULL, &health_Icon_Rect.w, &health_Icon_Rect.h);
-    health_Icon_Rect.w = ATTACK_P_SIZE;
-    health_Icon_Rect.h = ATTACK_P_SIZE;
-    health_Icon_Rect.x = attack_Text_Texture_rect.x + ATTACK_P_SIZE + 15;
-    health_Icon_Rect.y = size * ROOM_SIZE;
-    SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &health_Icon_Rect);
-
-    // Puntos de vida
-    sprintf(text, "%d", player1.health_points);
-    SDL_Surface *health_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
-    SDL_Texture *health_Text_Texture = SDL_CreateTextureFromSurface(rend, health_Text_Surface);
-    SDL_FreeSurface(health_Text_Surface);
-    SDL_Rect health_Text_Rect;                                   // create a rect
-    health_Text_Rect.x = health_Icon_Rect.x + ATTACK_P_SIZE + 5; // controls the rect's x coordinate
-    health_Text_Rect.y = health_Icon_Rect.y + 10;                // controls the rect's y coordinte
-    health_Text_Rect.w = ATTACK_P_SIZE - 10;                     // controls the width of the rect
-    health_Text_Rect.h = ATTACK_P_SIZE - 10;                     // controls the height of the rect
-    SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
 
     // controls animation loop
     int close = 0;
@@ -328,25 +267,8 @@ int main(int argc, char *argv[])
         // clears the screen
         SDL_RenderClear(rend);
         // SDL_RenderCopy(rend, tex, NULL, &dest);
-        renderMap(size, rooms);                                             // render map
-        drawplayer();                                                       // render player
-        SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
-
-        // render attack points
-        sprintf(text, "%d", player1.attack_points);
-        attack_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
-        attack_Text_Texture = SDL_CreateTextureFromSurface(rend, attack_Text_Surface);
-        SDL_FreeSurface(attack_Text_Surface);
-        SDL_RenderCopy(rend, attack_Text_Texture, NULL, &attack_Text_Texture_rect);
-
-        SDL_RenderCopy(rend, health_Icon_Texture, NULL, &health_Icon_Rect); // render health icon
-
-        // render health points
-        sprintf(text, "%d", player1.health_points);
-        health_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
-        health_Text_Texture = SDL_CreateTextureFromSurface(rend, health_Text_Surface);
-        SDL_FreeSurface(health_Text_Surface);
-        SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
+        renderMap(size, rooms);
+        drawplayer();
 
         // triggers the double buffers
         // for multiple rendering
@@ -359,10 +281,6 @@ int main(int argc, char *argv[])
     // destroy texture
     destroyMap(size, rooms);
     SDL_DestroyTexture(player1.texture);
-    SDL_DestroyTexture(&attack_Icon_Rect);
-    SDL_DestroyTexture(&attack_Text_Texture_rect);
-    SDL_DestroyTexture(&health_Icon_Rect);
-    SDL_DestroyTexture(&health_Text_Rect);
 
     // destroy renderer
     SDL_DestroyRenderer(rend);
