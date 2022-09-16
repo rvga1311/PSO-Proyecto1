@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     SDL_Window *win = SDL_CreateWindow("GAME", // creates a window
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       size * ROOM_SIZE, (size * ROOM_SIZE) + ATTACK_P_SIZE, 0);
+                                       (size * ROOM_SIZE) + 10 + ATTACK_P_SIZE, size * ROOM_SIZE, 0);
     SDL_SetWindowResizable(win, SDL_FALSE);
 
     // triggers the program that controls
@@ -191,8 +191,8 @@ int main(int argc, char *argv[])
     SDL_QueryTexture(attack_Icon_Texture, NULL, NULL, &attack_Icon_Rect.w, &attack_Icon_Rect.h);
     attack_Icon_Rect.w = ATTACK_P_SIZE;
     attack_Icon_Rect.h = ATTACK_P_SIZE;
-    attack_Icon_Rect.x = 0;
-    attack_Icon_Rect.y = size * ROOM_SIZE;
+    attack_Icon_Rect.x = size * ROOM_SIZE;
+    attack_Icon_Rect.y = 0;
     SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect);
 
     // Puntos de ataque
@@ -201,8 +201,8 @@ int main(int argc, char *argv[])
     SDL_Texture *attack_Text_Texture = SDL_CreateTextureFromSurface(rend, attack_Text_Surface);
     SDL_FreeSurface(attack_Text_Surface);
     SDL_Rect attack_Text_Texture_rect;                                   // create a rect
-    attack_Text_Texture_rect.x = attack_Icon_Rect.x + ATTACK_P_SIZE + 5; // controls the rect's x coordinate
-    attack_Text_Texture_rect.y = attack_Icon_Rect.y + 10;                // controls the rect's y coordinte
+    attack_Text_Texture_rect.x = size * ROOM_SIZE + 5;                   // controls the rect's x coordinate
+    attack_Text_Texture_rect.y = attack_Icon_Rect.y + ATTACK_P_SIZE + 5; // controls the rect's y coordinte
     attack_Text_Texture_rect.w = ATTACK_P_SIZE - 10;                     // controls the width of the rect
     attack_Text_Texture_rect.h = ATTACK_P_SIZE - 10;                     // controls the height of the rect
     SDL_RenderCopy(rend, attack_Text_Texture, NULL, &attack_Text_Texture_rect);
@@ -215,8 +215,8 @@ int main(int argc, char *argv[])
     SDL_QueryTexture(health_Icon_Texture, NULL, NULL, &health_Icon_Rect.w, &health_Icon_Rect.h);
     health_Icon_Rect.w = ATTACK_P_SIZE;
     health_Icon_Rect.h = ATTACK_P_SIZE;
-    health_Icon_Rect.x = attack_Text_Texture_rect.x + ATTACK_P_SIZE + 15;
-    health_Icon_Rect.y = size * ROOM_SIZE;
+    health_Icon_Rect.x = size * ROOM_SIZE;
+    health_Icon_Rect.y = attack_Text_Texture_rect.y + ATTACK_P_SIZE + 25;
     SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &health_Icon_Rect);
 
     // Puntos de vida
@@ -225,8 +225,8 @@ int main(int argc, char *argv[])
     SDL_Texture *health_Text_Texture = SDL_CreateTextureFromSurface(rend, health_Text_Surface);
     SDL_FreeSurface(health_Text_Surface);
     SDL_Rect health_Text_Rect;                                   // create a rect
-    health_Text_Rect.x = health_Icon_Rect.x + ATTACK_P_SIZE + 5; // controls the rect's x coordinate
-    health_Text_Rect.y = health_Icon_Rect.y + 10;                // controls the rect's y coordinte
+    health_Text_Rect.x = size * ROOM_SIZE + 5;                   // controls the rect's x coordinate
+    health_Text_Rect.y = health_Icon_Rect.y + ATTACK_P_SIZE + 5; // controls the rect's y coordinte
     health_Text_Rect.w = ATTACK_P_SIZE - 10;                     // controls the width of the rect
     health_Text_Rect.h = ATTACK_P_SIZE - 10;                     // controls the height of the rect
     SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
