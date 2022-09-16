@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     int close = 0;
     int speed = 300;
-    player1.sprite = "./Images/SpriteF.png";
+    player1.sprite = "./Images/Hero/SpriteF.png";
     player1.hitbox.x = 50;
     player1.hitbox.y = 50;
 
@@ -76,26 +76,26 @@ int main(int argc, char *argv[])
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
 
-                    player1.sprite = "./Images/SpriteB.png";
+                    player1.sprite = "./Images/Hero/SpriteB.png";
 
                     player1.hitbox.y -= (speed / 30) * 10;
                     break;
                 case SDL_SCANCODE_A:
                 case SDL_SCANCODE_LEFT:
 
-                    player1.sprite = "./Images/SpriteL.png";
+                    player1.sprite = "./Images/Hero/SpriteL.png";
                     player1.hitbox.x -= (speed / 30) * 10;
                     break;
                 case SDL_SCANCODE_S:
                 case SDL_SCANCODE_DOWN:
 
-                    player1.sprite = "./Images/SpriteF.png";
+                    player1.sprite = "./Images/Hero/SpriteF.png";
                     player1.hitbox.y += (speed / 30) * 10;
                     break;
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
 
-                    player1.sprite = "./Images/SpriteR.png";
+                    player1.sprite = "./Images/Hero/SpriteR.png";
                     player1.hitbox.x += (speed / 30) * 10;
                     break;
                 default:

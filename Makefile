@@ -1,13 +1,13 @@
 # Compilador
 CC := gcc
 # Flags de compilación
-CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lSDL2_ttf -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
+CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lSDL2_ttf -lncurses -lpthread -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
 # Archivos.h
-HEADERS :=
+HEADERS := frontend.h backend.h
 # Archivo main
-SOURCE := main.c
+SOURCES := main.c frontend.c backend.c
 # Archivos.o
-OBJS := $(SOURCE:.c=.o)
+OBJS := $(SOURCES:.c=.o)
 # Nombre del ejecutable
 EXEC := main
 
