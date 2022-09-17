@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
     // ==================== Escoger modo de juego ====================
     int difficulty;
     size = 0;
-    flagMapChanged = 0;
+    flagTrapActivated = 0;
+    flagTreasurePicked = 0;
     srand(time(0));
 
     while (size == 0)
@@ -49,10 +50,9 @@ int main(int argc, char *argv[])
     heroAttack = 1;
     hasWon = 0;
     fillMonsterArray(MAP);
+    struct room rooms[size];
 
     // ================== Frontend ==================
-    // Malloc of rooms vector pointer with size of the map
-    rooms = (struct room *)malloc(size * sizeof(struct room));
 
     TTF_Init();
 
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     player1.health_points = heroHealth;
     player1.attack_points = heroAttack;
 
-    drawMap(size);
+    drawMap(size, rooms);
 
     // Icono de espada
     SDL_Surface *attack_Icon_Surface = IMG_Load("./Images/Misc/sword.png");
@@ -240,13 +240,15 @@ int main(int argc, char *argv[])
         // clears the screen
         SDL_RenderClear(rend);
         // SDL_RenderCopy(rend, tex, NULL, &dest);
-        if (flagMapChanged)
+        if (flagTrapActivated || flagTreasurePicked)
         {
-            destroyMap(size, rooms);
-            drawMap(size);
-            flagMapChanged = 0;
+            pthread_mutex_lock(&lockMAP);
+            renderRoom(size, rooms, player1.hitbox.x, player1.hitbox.y);
+            flagTrapActivated = 0;
+            flagTreasurePicked = 0;
+            pthread_mutex_unlock(&lockMAP);
         }
-        renderMap(size);                                                    // render map
+        renderMap(size, rooms);                                             // render map
         drawplayer();                                                       // render player
         SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
 

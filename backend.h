@@ -24,7 +24,7 @@ typedef enum HeroAction
 
 typedef struct ROOMS
 {
-    int isVoid;                     
+    int isVoid;
     int isBeginning;
     int isEnd;
     int hasTreasure;
@@ -69,7 +69,8 @@ int heroHealth;
 int heroAttack;
 int size;
 int hasWon;
-int flagMapChanged;
+int flagTreasurePicked;
+int flagTrapActivated;
 
 int isNotVoid(int x, int y);
 int isOtherMonsterThere(int x, int y);
@@ -82,12 +83,13 @@ int isOtherMonsterThere(int x, int y);
 ROOM **fillMonsterArray(ROOM **matrix);
 int checkIfSurrounded(int x, int y);
 int checkIfOccupied(int x, int y);
-void pushIntCoords(int x, int y);;
+void pushIntCoords(int x, int y);
+;
 void instanceCoords();
 int randomNumber(int number);
 ROOM **createMatrix();
 void *heroActions();
-//int backend();
+// int backend();
 void printMap();
 
 #endif

@@ -11,7 +11,7 @@ void drawplayer()
     SDL_RenderCopy(rend, player1.texture, NULL, &player1.hitbox);
 }
 
-void renderMap(int size)
+void renderMap(int size, struct room rooms[size])
 {
     for (int i = 0; i < size; i++)
     {
@@ -31,7 +31,31 @@ int valid_move(int val[2], int size, int array[30][2])
     return 0;
 }
 
-void drawMap(int size)
+void renderRoom(int size, struct room rooms[size], int x, int y)
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (rooms[i].location.x == x && rooms[i].location.y == y)
+        {
+            if (flagTrapActivated)
+            {
+                rooms[i].surface = IMG_Load("./Images/Room/RoomTreasureChest.jpg");
+            }
+            else if (flagTreasurePicked)
+            {
+                rooms[i].surface = IMG_Load("./Images/Room/RoomTrapChest.jpg");
+            }
+
+            rooms[i].texture = SDL_CreateTextureFromSurface(rend, rooms[i].surface);
+            SDL_FreeSurface(rooms[i].surface);
+            SDL_QueryTexture(rooms[i].texture, NULL, NULL, &rooms[i].location.w, &rooms[i].location.h);
+            rooms[i].location.w = ROOM_SIZE;
+            rooms[i].location.h = ROOM_SIZE;
+        }
+    }
+}
+
+void drawMap(int size, struct room rooms[size])
 {
 
     int currentX = 0;
@@ -50,25 +74,13 @@ void drawMap(int size)
                 }
                 else if (MAP[i][y].isBeginning == 1)
                 {
-                    if (!flagMapChanged)
-                    {
-                        player1.hitbox.x = currentX;
-                        player1.hitbox.y = currentY;
-                    }
-
-                    rooms[counter].surface = IMG_Load("./Images/Room/InitialRoom.jpeg");
+                    player1.hitbox.x = currentX;
+                    player1.hitbox.y = currentY;
+                    rooms[counter].surface = IMG_Load("./Images/Room/InitialRoom.jpg");
                 }
                 else if (MAP[i][y].isEnd == 1)
                 {
                     rooms[counter].surface = IMG_Load("./Images/Room/FinalRoom.jpg");
-                }
-                else if (MAP[i][y].hadTreasure == 1)
-                {
-                    rooms[counter].surface = IMG_Load("./Images/Room/RoomTreasureChest.jpg");
-                }
-                else if (MAP[i][y].hadTrap == 1)
-                {
-                    rooms[counter].surface = IMG_Load("./Images/Room/RoomTrapChest.jpg");
                 }
                 else
                 {

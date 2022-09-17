@@ -40,12 +40,11 @@ struct room
     int j;
 };
 
-struct room *rooms;
-
 void drawplayer();
-void renderMap(int size);
+void renderMap(int size, struct room rooms[size]);
 int valid_move(int val[2], int size, int array[30][2]);
-void drawMap(int size);
+void drawMap(int size, struct room rooms[size]);
 void destroyMap(int size, struct room rooms[size]);
+void renderRoom(int size, struct room rooms[size], int x, int y);
 
 #endif
