@@ -72,6 +72,7 @@ void drawMap(int size, struct room rooms[size])
                 if (MAP[i][y].hasTrap == 1 || MAP[i][y].hasTreasure == 1)
                 {
                     rooms[counter].surface = IMG_Load("./Images/Room/RoomCloseChest.jpg");
+                    printf("Chest %d, %d\n", y, i);
                 }
                 else if (MAP[i][y].isBeginning == 1)
                 {

@@ -1,4 +1,18 @@
 #include "frontend.h"
+int availableKeyboard;
+int close1;
+pthread_mutex_t lockKeyboard;
+
+void *playerControlTime()
+{
+    pthread_mutex_lock(&lockKeyboard);
+    availableKeyboard = 1;
+    sleep(0.1);
+    availableKeyboard = 0;
+    pthread_mutex_unlock(&lockKeyboard);
+
+    pthread_exit(NULL);
+}
 
 int main(int argc, char *argv[])
 {
@@ -46,12 +60,16 @@ int main(int argc, char *argv[])
     }
 
     // ==================== Inicializar Hilo Jugador ====================
+    close1 = 0;
+
     pthread_create(&Hero.heroAction, NULL, &heroActions, NULL);
     heroHealth = 5;
     heroAttack = 1;
     hasWon = 0;
     fillMonsterArray(MAP);
     struct room rooms[size];
+
+    pthread_t playerControlThread;
 
     // ================== Frontend ==================
 
@@ -143,30 +161,30 @@ int main(int argc, char *argv[])
     damagePlayer_Rect.h = ICON_SIZE - 10;
 
     // controls animation loop
-    int close = 0;
 
     // speed of box
     int speed = 300;
-    int possibleMovement[2];
 
     // animation loop
-    while (!close)
+    while (!close1)
     {
         SDL_Event event;
+        int possibleMovement[2];
+        int waitPlayer = 0;
 
         // Events management
         while (SDL_PollEvent(&event))
+
         {
             switch (event.type)
             {
 
             case SDL_QUIT:
-                // handling of close button
-                close = 1;
+                // handling of close1 button
+                close1 = 1;
                 break;
 
             case SDL_KEYDOWN:
-                // keyboard API for key pressed
                 switch (event.key.keysym.scancode)
                 {
                 case SDL_SCANCODE_W:
@@ -174,11 +192,12 @@ int main(int argc, char *argv[])
 
                     possibleMovement[0] = player1.hitbox.x;
                     possibleMovement[1] = player1.hitbox.y - ROOM_SIZE;
-                    if (valid_move(possibleMovement, player1.positions_Num, player1.positions))
+                    if (!availableKeyboard && valid_move(possibleMovement, player1.positions_Num, player1.positions))
                     {
                         player1.sprite = "./Images/Hero/SpriteB.png";
                         player1.hitbox.y -= ROOM_SIZE;
                         lastUserAction = MOVE_UP;
+                        waitPlayer = 1;
                     }
 
                     break;
@@ -186,11 +205,12 @@ int main(int argc, char *argv[])
                 case SDL_SCANCODE_LEFT:
                     possibleMovement[0] = player1.hitbox.x - ROOM_SIZE;
                     possibleMovement[1] = player1.hitbox.y;
-                    if (valid_move(possibleMovement, player1.positions_Num, player1.positions))
+                    if (!availableKeyboard && valid_move(possibleMovement, player1.positions_Num, player1.positions))
                     {
                         player1.sprite = "./Images/Hero/SpriteL.png";
                         player1.hitbox.x -= ROOM_SIZE;
                         lastUserAction = MOVE_LEFT;
+                        waitPlayer = 1;
                     }
 
                     break;
@@ -198,11 +218,12 @@ int main(int argc, char *argv[])
                 case SDL_SCANCODE_DOWN:
                     possibleMovement[0] = player1.hitbox.x;
                     possibleMovement[1] = player1.hitbox.y + ROOM_SIZE;
-                    if (valid_move(possibleMovement, player1.positions_Num, player1.positions))
+                    if (!availableKeyboard && valid_move(possibleMovement, player1.positions_Num, player1.positions))
                     {
                         player1.sprite = "./Images/Hero/SpriteF.png";
                         player1.hitbox.y += ROOM_SIZE;
                         lastUserAction = MOVE_DOWN;
+                        waitPlayer = 1;
                     }
 
                     break;
@@ -211,21 +232,28 @@ int main(int argc, char *argv[])
 
                     possibleMovement[0] = player1.hitbox.x + ROOM_SIZE;
                     possibleMovement[1] = player1.hitbox.y;
-                    if (valid_move(possibleMovement, player1.positions_Num, player1.positions))
+                    if (!availableKeyboard && valid_move(possibleMovement, player1.positions_Num, player1.positions))
                     {
                         player1.sprite = "./Images/Hero/SpriteR.png";
                         player1.hitbox.x += ROOM_SIZE;
                         lastUserAction = MOVE_RIGHT;
+                        waitPlayer = 1;
                     }
+
                     break;
                 case SDL_SCANCODE_E:
                     lastUserAction = PICK_TREASURE;
+                    printf("Player %d,%d\n", player1.hitbox.x / 33, player1.hitbox.y / 33);
                     break;
                 default:
                     lastUserAction = IDLE;
                     break;
                 }
             }
+        }
+        if (waitPlayer)
+        {
+            pthread_create(&playerControlThread, NULL, &playerControlTime, NULL);
         }
 
         // right boundary
@@ -293,7 +321,13 @@ int main(int argc, char *argv[])
         SDL_Delay(1000 / 30);
         if (heroHealth <= 0)
         {
-            close = 1;
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", "You lost the game", NULL);
+            close1 = 1;
+        }
+        else if (hasWon)
+        {
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", "You won the game", NULL);
+            close1 = 1;
         }
     }
 
@@ -305,13 +339,15 @@ int main(int argc, char *argv[])
     SDL_DestroyTexture(&health_Icon_Rect);
     SDL_DestroyTexture(&health_Text_Rect);
 
+    pthread_mutex_destroy(&lockKeyboard);
+
     // destroy renderer
     SDL_DestroyRenderer(rend);
 
     // destroy window
     SDL_DestroyWindow(win);
 
-    // close SDL
+    // close1 SDL
     SDL_Quit();
 
     return 0;
