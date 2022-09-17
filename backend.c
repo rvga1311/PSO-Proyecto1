@@ -532,6 +532,14 @@ ROOM **createMatrix()
     return matrix;
 }
 
+void *damageAnimation(void *arg)
+{
+    playerTakeDamage = 1;
+    sleep(1);
+    playerTakeDamage = 0;
+    pthread_exit(NULL);
+}
+
 void *heroActions()
 {
     // lock MAP
@@ -576,6 +584,8 @@ void *heroActions()
                 heroHealth--;
                 player1.health_points--;
 
+                pthread_t thread;
+                pthread_create(&thread, NULL, &damageAnimation, NULL);
                 pthread_mutex_unlock(&lockHero);
 
                 pthread_mutex_lock(&lockMAP);

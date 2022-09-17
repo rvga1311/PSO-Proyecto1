@@ -71,6 +71,7 @@ int size;
 int hasWon;
 int flagTreasurePicked;
 int flagTrapActivated;
+int playerTakeDamage;
 
 int isNotVoid(int x, int y);
 int isOtherMonsterThere(int x, int y);

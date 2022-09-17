@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     size = 0;
     flagTrapActivated = 0;
     flagTreasurePicked = 0;
+    playerTakeDamage = 0;
     srand(time(0));
 
     while (size == 0)
@@ -132,6 +133,15 @@ int main(int argc, char *argv[])
     health_Text_Rect.h = ICON_SIZE - 10;                     // controls the height of the rect
     SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
 
+    // Icono de espada
+    SDL_Surface *damagePlayer_Surface = IMG_Load("./Images/Misc/sword.png");
+    SDL_Texture *damagePlayer_Texture = SDL_CreateTextureFromSurface(rend, damagePlayer_Surface);
+    SDL_FreeSurface(damagePlayer_Surface);
+    SDL_Rect damagePlayer_Rect;
+    SDL_QueryTexture(damagePlayer_Texture, NULL, NULL, &damagePlayer_Rect.w, &damagePlayer_Rect.h);
+    damagePlayer_Rect.w = ICON_SIZE - 10;
+    damagePlayer_Rect.h = ICON_SIZE - 10;
+
     // controls animation loop
     int close = 0;
 
@@ -251,6 +261,13 @@ int main(int argc, char *argv[])
         renderMap(size, rooms);                                             // render map
         drawplayer();                                                       // render player
         SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
+
+        if (playerTakeDamage)
+        {
+            damagePlayer_Rect.x = player1.hitbox.x;
+            damagePlayer_Rect.y = player1.hitbox.y;
+            SDL_RenderCopy(rend, damagePlayer_Texture, NULL, &damagePlayer_Rect);
+        }
 
         // render attack points
         sprintf(text, "%d", player1.attack_points);
