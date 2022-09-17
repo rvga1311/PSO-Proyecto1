@@ -16,6 +16,8 @@ SDL_Surface *surface;
 TTF_Font *font;
 char *text[5];
 
+int gameStarted;
+
 struct player
 {
     char *sprite;
@@ -39,12 +41,13 @@ struct room
     int i;
     int j;
 };
-
+struct room *rooms;
 void drawplayer();
-void renderMap(int size, struct room rooms[size]);
+void renderMap(int size);
 int valid_move(int val[2], int size, int array[30][2]);
-void drawMap(int size, struct room rooms[size]);
-void destroyMap(int size, struct room rooms[size]);
-void renderRoom(int size, struct room rooms[size], int x, int y);
+void drawMap(int size);
+void destroyMap(int size);
+void renderRoom(int size, int x, int y);
+void renderRat(int size);
 
 #endif

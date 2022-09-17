@@ -11,11 +11,19 @@ void drawplayer()
     SDL_RenderCopy(rend, player1.texture, NULL, &player1.hitbox);
 }
 
-void renderMap(int size, struct room rooms[size])
+void renderMap(int size)
 {
     for (int i = 0; i < size; i++)
     {
         SDL_RenderCopy(rend, rooms[i].texture, NULL, &rooms[i].location);
+    }
+}
+
+void renderRat(int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        SDL_RenderCopy(rend, monsterArray[i].texture, NULL, &monsterArray[i].hitbox);
     }
 }
 
@@ -31,7 +39,7 @@ int valid_move(int val[2], int size, int array[30][2])
     return 0;
 }
 
-void renderRoom(int size, struct room rooms[size], int x, int y)
+void renderRoom(int size, int x, int y)
 {
     for (int i = 0; i < size; i++)
     {
@@ -56,7 +64,7 @@ void renderRoom(int size, struct room rooms[size], int x, int y)
     }
 }
 
-void drawMap(int size, struct room rooms[size])
+void drawMap(int size)
 {
 
     int currentX = 0;
@@ -76,13 +84,25 @@ void drawMap(int size, struct room rooms[size])
                 }
                 else if (MAP[i][y].isBeginning == 1)
                 {
-                    player1.hitbox.x = currentX;
-                    player1.hitbox.y = currentY;
+                    if (!gameStarted)
+                    {
+                        player1.hitbox.x = currentX;
+                        player1.hitbox.y = currentY;
+                    }
+
                     rooms[counter].surface = IMG_Load("./Images/Room/InitialRoom.jpg");
                 }
                 else if (MAP[i][y].isEnd == 1)
                 {
                     rooms[counter].surface = IMG_Load("./Images/Room/FinalRoom.jpg");
+                }
+                else if (MAP[i][y].hadTrap == 1)
+                {
+                    rooms[counter].surface = IMG_Load("./Images/Room/RoomTrapChest.jpg");
+                }
+                else if (MAP[i][y].hadTreasure == 1)
+                {
+                    rooms[counter].surface = IMG_Load("./Images/Room/RoomTreasureChest.jpg");
                 }
                 else
                 {
@@ -110,7 +130,7 @@ void drawMap(int size, struct room rooms[size])
     }
 }
 
-void destroyMap(int size, struct room rooms[size])
+void destroyMap(int size)
 {
     for (int i = 0; i < size; i++)
     {

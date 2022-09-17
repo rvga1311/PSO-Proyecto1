@@ -126,7 +126,6 @@ void printMonsterArray()
     int i;
     for (i = 0; i < size / 2; i++)
     {
-        // printf("Monster %d, HP:%d - X:%d - Y:%d - isResting:%d \n", i + 1, monsterArray[i].health, monsterArray[i].positionX, monsterArray[i].positionY, monsterArray[i].isResting);
     }
 }
 
@@ -177,6 +176,15 @@ ROOM **fillMonsterArray(ROOM **matrix)
             monsterArray[monstersCreated].health = 3;
             monsterArray[monstersCreated].positionX = Coords[randomPosition].axisX;
             monsterArray[monstersCreated].positionY = Coords[randomPosition].axisY;
+            monsterArray[monstersCreated].surface = IMG_Load("./Images/Misc/rat.png");
+            monsterArray[monstersCreated].texture = SDL_CreateTextureFromSurface(rend, monsterArray[monstersCreated].surface);
+            SDL_FreeSurface(monsterArray[monstersCreated].surface);
+            SDL_QueryTexture(monsterArray[monstersCreated].texture, NULL, NULL, &monsterArray[monstersCreated].hitbox.w, &monsterArray[monstersCreated].hitbox.h);
+
+            monsterArray[monstersCreated].hitbox.w = ROOM_SIZE;
+            monsterArray[monstersCreated].hitbox.h = ROOM_SIZE;
+            monsterArray[monstersCreated].hitbox.x = Coords[randomPosition].axisY * ROOM_SIZE;
+            monsterArray[monstersCreated].hitbox.y = Coords[randomPosition].axisX * ROOM_SIZE;
             monstersCreated++;
             matrix[Coords[randomPosition].axisX][Coords[randomPosition].axisY].hasMonster = 1;
         }

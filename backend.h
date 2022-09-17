@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
@@ -54,6 +56,9 @@ typedef struct MONSTERS
     int positionX;
     int positionY;
     int isResting;
+    SDL_Surface *surface;
+    SDL_Texture *texture;
+    SDL_Rect hitbox;
     pthread_t action;
 } MONSTER;
 pthread_mutex_t lockMAP;

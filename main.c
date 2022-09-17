@@ -2,6 +2,9 @@
 int availableKeyboard;
 int close1;
 pthread_mutex_t lockKeyboard;
+struct room *rooms;
+int flagDrawMap;
+int gameStarted = 0;
 
 void *playerControlTime()
 {
@@ -67,7 +70,8 @@ int main(int argc, char *argv[])
     heroAttack = 1;
     hasWon = 0;
     fillMonsterArray(MAP);
-    struct room rooms[size];
+    // Malloc rooms struct
+    rooms = malloc(sizeof(struct room) * size);
 
     pthread_t playerControlThread;
 
@@ -100,8 +104,9 @@ int main(int argc, char *argv[])
     player1.positions_Num = size;
     player1.health_points = heroHealth;
     player1.attack_points = heroAttack;
+    drawMap(size);
 
-    drawMap(size, rooms);
+    gameStarted = 1;
 
     // Icono de espada
     SDL_Surface *attack_Icon_Surface = IMG_Load("./Images/Misc/sword.png");
@@ -168,6 +173,7 @@ int main(int argc, char *argv[])
     // animation loop
     while (!close1)
     {
+
         SDL_Event event;
         int possibleMovement[2];
         int waitPlayer = 0;
@@ -281,13 +287,14 @@ int main(int argc, char *argv[])
         if (flagTrapActivated || flagTreasurePicked)
         {
             pthread_mutex_lock(&lockMAP);
-            renderRoom(size, rooms, player1.hitbox.x, player1.hitbox.y);
+            renderRoom(size, player1.hitbox.x, player1.hitbox.y);
             flagTrapActivated = 0;
             flagTreasurePicked = 0;
             pthread_mutex_unlock(&lockMAP);
         }
-        renderMap(size, rooms);                                             // render map
-        drawplayer();                                                       // render player
+        renderMap(size); // render map
+        drawplayer();
+        // renderRat(size);                                                    // render player
         SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
 
         if (playerTakeDamage)
@@ -332,7 +339,7 @@ int main(int argc, char *argv[])
     }
 
     // destroy texture
-    destroyMap(size, rooms);
+    destroyMap(size);
     SDL_DestroyTexture(player1.texture);
     SDL_DestroyTexture(&attack_Icon_Rect);
     SDL_DestroyTexture(&attack_Text_Texture_rect);
