@@ -563,6 +563,7 @@ void *heroActions()
                     // printf("You didn't find any treasure!\n");
                 }
                 pthread_mutex_lock(&lockMAP);
+                flagTrapActivated = 0;
                 flagTreasurePicked = 1;
                 MAP[Hero.positionX][Hero.positionY].hasTreasure = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTreasure = 1;
@@ -579,6 +580,7 @@ void *heroActions()
 
                 pthread_mutex_lock(&lockMAP);
                 flagTrapActivated = 1;
+                flagTreasurePicked = 0;
                 MAP[Hero.positionX][Hero.positionY].hasTrap = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTrap = 1;
                 pthread_mutex_unlock(&lockMAP);

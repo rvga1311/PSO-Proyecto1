@@ -37,11 +37,12 @@ void renderRoom(int size, struct room rooms[size], int x, int y)
     {
         if (rooms[i].location.x == x && rooms[i].location.y == y)
         {
-            if (flagTrapActivated)
+            printf("flags treasure %d, trap %d\n", flagTreasurePicked, flagTrapActivated);
+            if (flagTreasurePicked)
             {
                 rooms[i].surface = IMG_Load("./Images/Room/RoomTreasureChest.jpg");
             }
-            else if (flagTreasurePicked)
+            else if (flagTrapActivated)
             {
                 rooms[i].surface = IMG_Load("./Images/Room/RoomTrapChest.jpg");
             }
