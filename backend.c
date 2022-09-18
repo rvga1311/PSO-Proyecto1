@@ -15,7 +15,7 @@ void *monstersActions(void *imMonster)
         // DECIDE PARA DONDE MOVERSE
         int newDirection;
         int keepGoing = 0;
-        if (actualMonster->health < 1)
+        if (actualMonster->health == 0)
         {
 
             pthread_mutex_lock(&lockMAP);
@@ -28,13 +28,14 @@ void *monstersActions(void *imMonster)
         if (actualMonster->positionX == Hero.positionX && actualMonster->positionY == Hero.positionY)
         {
 
+            pthread_t thread;
+            pthread_create(&thread, NULL, &damageAnimation, NULL);
+
             // lock Health
             pthread_mutex_lock(&lockHero);
             // ATACAR
             heroHealth -= 1;
             player1.health_points -= 1;
-            pthread_t thread;
-            pthread_create(&thread, NULL, &damageAnimation, NULL);
 
             // printf("El heroe ha sido atacado por un monstruo y ahora tiene %d de vida\n", heroHealth);
             // unlock
@@ -109,8 +110,9 @@ void *monstersActions(void *imMonster)
         // SE PONE A MIMIR
         
         actualMonster->isResting = 1;
-        usleep((sleepTime + 1) * 1000000);
+        usleep((sleepTime + 1) * 100000);
         actualMonster->isResting = 0;
+  
         // YA SE LEVANTÓ
     }
 }
@@ -152,7 +154,7 @@ int isOtherMonsterThere(int x, int y)
 {
     int i;
     for (i = 0; i < size / 2; i++)
-    {
+    {   
         if (monsterArray[i].positionX == x && monsterArray[i].positionY == y)
         {
             return 1;
@@ -560,7 +562,7 @@ void *heroActions()
         switch (lastUserAction)
         {
         case PICK_TREASURE:
-            printf("Pos %d %d\n", Hero.positionX, Hero.positionY);
+            // printf("Pos %d %d\n", Hero.positionX, Hero.positionY);
             if (MAP[player1.hitbox.y / ROOM_SIZE][player1.hitbox.x / ROOM_SIZE].hasTreasure == 1)
             {
                 int treasureType = rand() % 2;
@@ -604,21 +606,23 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hadTrap = 1;
                 pthread_mutex_unlock(&lockMAP);
             }
-
+            lastUserAction = IDLE;
             break;
         case ATTACK:;
             int currentMonsterIdx = whichMonster();
             if (currentMonsterIdx != -1 && monsterArray[currentMonsterIdx].isResting == 1)
             {
                 // lock monsterHealth
+                MONSTER *monster = &monsterArray[currentMonsterIdx];
                 monsterArray[currentMonsterIdx].health = monsterArray[currentMonsterIdx].health - heroAttack;
                 pthread_t thread;
                 pthread_create(&thread, NULL, &damageAnimation, NULL);
+                
                 // pthread_mutex_unlock(&lockMAP);
                 // unlock MAP
             }
             // printf("You attacked the monster!\n");
-
+            lastUserAction = IDLE;
             break;
 
         case MOVE_LEFT:
@@ -630,7 +634,7 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
                 pthread_mutex_unlock(&lockMAP);
             }
-
+            lastUserAction = IDLE;
             break;
         case MOVE_RIGHT:
             if (Hero.positionY < size - 1 && MAP[Hero.positionX][Hero.positionY + 1].isVoid != 1 && isOtherMonsterThere(Hero.positionX, Hero.positionY + 1) == 0)
@@ -641,7 +645,7 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
                 pthread_mutex_unlock(&lockMAP);
             }
-
+            lastUserAction = IDLE;
             break;
         case MOVE_UP:
             if (Hero.positionX > 0 && MAP[Hero.positionX - 1][Hero.positionY].isVoid != 1 && isOtherMonsterThere(Hero.positionX - 1, Hero.positionY) == 0)
@@ -653,7 +657,7 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
                 pthread_mutex_unlock(&lockMAP);
             }
-
+            lastUserAction = IDLE;
             break;
         case MOVE_DOWN:
             if (Hero.positionX < size - 1 && MAP[Hero.positionX + 1][Hero.positionY].isVoid != 1 && isOtherMonsterThere(Hero.positionX + 1, Hero.positionY) == 0)
@@ -664,7 +668,7 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
                 pthread_mutex_unlock(&lockMAP);
             }
-
+            lastUserAction = IDLE;
             break;
         }
 
