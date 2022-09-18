@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
                     break;
                 case SDL_SCANCODE_E:
                     lastUserAction = PICK_TREASURE;
-                    printf("Player %d,%d\n", player1.hitbox.x / 33, player1.hitbox.y / 33);
+                    // printf("Player %d,%d\n", player1.hitbox.x / 33, player1.hitbox.y / 33);
                     break;
                 case SDL_SCANCODE_K:
                     lastUserAction = ATTACK;
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
         }
         renderMap(size); // render map
         renderRat(size);
-        drawplayer();    // render player
+        drawplayer();                                                       // render player
         SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
 
         if (playerTakeDamage)
