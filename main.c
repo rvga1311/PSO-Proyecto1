@@ -1,4 +1,5 @@
 #include "frontend.h"
+
 int availableKeyboard;
 int close1;
 pthread_mutex_t lockKeyboard;
@@ -33,8 +34,16 @@ int main(int argc, char *argv[])
         // print please enter a difficulty level
         printf("Please enter a difficulty level (1, 2, or 3): \n");
 
-        scanf("%d", &difficulty);
-        system("clear");
+        int ret = scanf("%d", &difficulty);
+        if (ret != 1)
+        {
+            printf("scanf() failed.\n");
+        }
+        int systemRet = system("clear");
+        if (systemRet == -1)
+        {
+            printf("system() failed.\n");
+        }
 
         switch (difficulty)
         {
@@ -55,8 +64,12 @@ int main(int argc, char *argv[])
             MAP = createMatrix();
             break;
 
-        default:
-            system("clear");
+        default:;
+            int ret = system("clear");
+            if (ret == -1)
+            {
+                printf("system() failed.\n");
+            }
             printf("Please enter a valid difficulty level (1, 2, or 3): \n");
             break;
         }
@@ -70,6 +83,10 @@ int main(int argc, char *argv[])
     heroAttack = 1;
     hasWon = 0;
     fillMonsterArray(MAP);
+    for (int i = 0; i < size / 2; i++)
+    {
+        monsterArray[i].action = pthread_create(&monsterArray[i].action, NULL, &monstersActions, &monsterArray[i]);
+    }
     // Malloc rooms struct
     rooms = malloc(sizeof(struct room) * size);
 
@@ -168,7 +185,7 @@ int main(int argc, char *argv[])
     // controls animation loop
 
     // speed of box
-    int speed = 300;
+    // int speed = 300;
 
     // animation loop
     while (!close1)
@@ -251,6 +268,9 @@ int main(int argc, char *argv[])
                     lastUserAction = PICK_TREASURE;
                     printf("Player %d,%d\n", player1.hitbox.x / 33, player1.hitbox.y / 33);
                     break;
+                case SDL_SCANCODE_K:
+                    lastUserAction = ATTACK;
+                    break;
                 default:
                     lastUserAction = IDLE;
                     break;
@@ -293,8 +313,8 @@ int main(int argc, char *argv[])
             pthread_mutex_unlock(&lockMAP);
         }
         renderMap(size); // render map
-        drawplayer();
-        // renderRat(size);                                                    // render player
+        renderRat(size);
+        drawplayer();    // render player
         SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
 
         if (playerTakeDamage)

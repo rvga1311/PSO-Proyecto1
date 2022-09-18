@@ -1,4 +1,5 @@
 #include "frontend.h"
+#include "backend.h"
 
 void drawplayer()
 {
@@ -21,9 +22,20 @@ void renderMap(int size)
 
 void renderRat(int size)
 {
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size / 2; i++)
     {
-        SDL_RenderCopy(rend, monsterArray[i].texture, NULL, &monsterArray[i].hitbox);
+        monsterArray[i].surface = IMG_Load("./Images/Misc/rat.png");
+        monsterArray[i].texture = SDL_CreateTextureFromSurface(rend, monsterArray[i].surface);
+        SDL_FreeSurface(monsterArray[i].surface);
+        SDL_QueryTexture(monsterArray[i].texture, NULL, NULL, &monsterArray[i].hitbox.w, &monsterArray[i].hitbox.h);
+
+        monsterArray[i].hitbox.w = ROOM_SIZE;
+        monsterArray[i].hitbox.h = ROOM_SIZE;
+
+        if (monsterArray[i].health > 0)
+        {
+            SDL_RenderCopy(rend, monsterArray[i].texture, NULL, &monsterArray[i].hitbox);
+        }
     }
 }
 
@@ -33,7 +45,10 @@ int valid_move(int val[2], int size, int array[30][2])
     {
         if (array[i][0] == val[0] && array[i][1] == val[1])
         {
-            return 1;
+            if (isOtherMonsterThere(val[1] / ROOM_SIZE, val[0] / ROOM_SIZE) == 0)
+            {
+                return 1;
+            }
         }
     }
     return 0;

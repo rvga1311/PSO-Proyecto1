@@ -97,5 +97,6 @@ ROOM **createMatrix();
 void *heroActions();
 // int backend();
 void printMap();
+void *damageAnimation(void *arg);
 
 #endif

@@ -32,6 +32,9 @@ void *monstersActions(void *imMonster)
             pthread_mutex_lock(&lockHero);
             // ATACAR
             heroHealth -= 1;
+            player1.health_points -= 1;
+            pthread_t thread;
+            pthread_create(&thread, NULL, &damageAnimation, NULL);
 
             // printf("El heroe ha sido atacado por un monstruo y ahora tiene %d de vida\n", heroHealth);
             // unlock
@@ -99,9 +102,12 @@ void *monstersActions(void *imMonster)
 
             actualMonster->positionX = newX;
             actualMonster->positionY = newY;
+            actualMonster->hitbox.x = newY * ROOM_SIZE;
+            actualMonster->hitbox.y = newX * ROOM_SIZE;
         }
 
         // SE PONE A MIMIR
+        
         actualMonster->isResting = 1;
         usleep((sleepTime + 1) * 1000000);
         actualMonster->isResting = 0;
@@ -134,7 +140,7 @@ int whichMonster()
     int i;
     for (i = 0; i < size / 2; i++)
     {
-        if (monsterArray[i].positionX == Hero.positionX && monsterArray[i].positionY == Hero.positionY)
+        if (monsterArray[i].positionX == player1.hitbox.y / ROOM_SIZE && monsterArray[i].positionY == player1.hitbox.x / ROOM_SIZE)
         {
             return i;
         }
@@ -158,10 +164,8 @@ int isOtherMonsterThere(int x, int y)
 ROOM **fillMonsterArray(ROOM **matrix)
 {
     // printw("CREANDO MONSTRUOS\n");
-    refresh();
     monsterArray = (MONSTER *)malloc((size / 2) * sizeof(MONSTER));
     // printw("FINAL MONSTRUOS \n");
-    refresh();
     int monstersCreated = 0;
     int randomPosition;
     while (monstersCreated < (size / 2))
@@ -176,10 +180,6 @@ ROOM **fillMonsterArray(ROOM **matrix)
             monsterArray[monstersCreated].health = 3;
             monsterArray[monstersCreated].positionX = Coords[randomPosition].axisX;
             monsterArray[monstersCreated].positionY = Coords[randomPosition].axisY;
-            monsterArray[monstersCreated].surface = IMG_Load("./Images/Misc/rat.png");
-            monsterArray[monstersCreated].texture = SDL_CreateTextureFromSurface(rend, monsterArray[monstersCreated].surface);
-            SDL_FreeSurface(monsterArray[monstersCreated].surface);
-            SDL_QueryTexture(monsterArray[monstersCreated].texture, NULL, NULL, &monsterArray[monstersCreated].hitbox.w, &monsterArray[monstersCreated].hitbox.h);
 
             monsterArray[monstersCreated].hitbox.w = ROOM_SIZE;
             monsterArray[monstersCreated].hitbox.h = ROOM_SIZE;
@@ -561,7 +561,7 @@ void *heroActions()
         {
         case PICK_TREASURE:
             printf("Pos %d %d\n", Hero.positionX, Hero.positionY);
-            if (MAP[Hero.positionX][Hero.positionY].hasTreasure == 1)
+            if (MAP[player1.hitbox.y / ROOM_SIZE][player1.hitbox.x / ROOM_SIZE].hasTreasure == 1)
             {
                 int treasureType = rand() % 2;
                 if (treasureType)
@@ -612,7 +612,9 @@ void *heroActions()
             {
                 // lock monsterHealth
                 monsterArray[currentMonsterIdx].health = monsterArray[currentMonsterIdx].health - heroAttack;
-                pthread_mutex_unlock(&lockMAP);
+                pthread_t thread;
+                pthread_create(&thread, NULL, &damageAnimation, NULL);
+                // pthread_mutex_unlock(&lockMAP);
                 // unlock MAP
             }
             // printf("You attacked the monster!\n");
@@ -666,13 +668,12 @@ void *heroActions()
             break;
         }
 
-        if (MAP[Hero.positionX][Hero.positionY].isEnd == 1)
+        if (MAP[player1.hitbox.y / ROOM_SIZE][player1.hitbox.x / ROOM_SIZE].isEnd == 1)
         {
-            // printf("You found the exit!\n");
+            printf("You found the exit!\n");
             hasWon = 1;
             // printw("WINNER WINNER CHICKEN DINNER\n");
-            refresh();
-
+            // refresh();
             pthread_exit(0);
         }
         // {
@@ -686,6 +687,16 @@ void *heroActions()
         // usleep(100000);
     }
 }
+
+void print_monsters()
+{
+    for (int i = 0; i < size / 2; i++)
+    {
+        printf("Monster (%d, %d): %d\n", monsterArray[i].positionX, monsterArray[i].positionY, monsterArray[i].health);
+    }
+    printf("\n");
+}
+
 
 // int main()
 // {

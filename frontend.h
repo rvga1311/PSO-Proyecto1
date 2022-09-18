@@ -14,7 +14,7 @@
 SDL_Renderer *rend;
 SDL_Surface *surface;
 TTF_Font *font;
-char *text[5];
+char text[5];
 
 int gameStarted;
 
