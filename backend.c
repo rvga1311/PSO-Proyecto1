@@ -37,7 +37,7 @@ void *monstersActions(void *imMonster)
             heroHealth -= 1;
             flagAttack = 1;
 
-            pthread_create(&ratDamageThread, NULL, &damageAnimation, NULL);
+            pthread_create(&ratDamageThread, NULL, &playerTakeDmgAnimation, NULL);
         }
         else
         {
@@ -127,7 +127,7 @@ void *monstersActions(void *imMonster)
         else if (flagAttack == 1)
         {
             actualMonster->isResting = 1;
-            sleep(1);
+            usleep(500000);
             actualMonster->isResting = 0;
             flagAttack = 0;
             flagMoved = 0;
@@ -579,8 +579,9 @@ ROOM **createMatrix()
     return matrix;
 }
 
-void *damageAnimation(void *arg)
+void *playerTakeDmgAnimation(void *arg)
 {
+    Mix_PlayChannel(-1, playerTakeDmgSound, 0);
     playerTakeDamage = 1;
     sleep(1);
     playerTakeDamage = 0;
@@ -589,6 +590,7 @@ void *damageAnimation(void *arg)
 
 void *playerAttackAnimation(void *arg)
 {
+    Mix_PlayChannel(-1, ratTakeDmgSound, 0);
     playerAttackRat = 1;
     sleep(1);
     playerAttackRat = 0;
@@ -612,6 +614,7 @@ void *heroActions()
             // printf("Pos %d %d\n", Hero.positionX, Hero.positionY);
             if (MAP[player1.hitbox.y / ROOM_SIZE][player1.hitbox.x / ROOM_SIZE].hasTreasure == 1)
             {
+                Mix_PlayChannel(-1, openChestSound, 0);
                 int treasureType = rand() % 2;
                 if (treasureType)
                 {
@@ -639,13 +642,14 @@ void *heroActions()
             }
             else if (MAP[Hero.positionX][Hero.positionY].hasTrap == 1)
             {
+                Mix_PlayChannel(-1, openChestSound, 0);
                 // printf("You stepped on a trap!\n");
                 // pthread_mutex_lock(&lockHero);
                 heroHealth--;
                 player1.health_points--;
 
                 pthread_t thread;
-                pthread_create(&thread, NULL, &damageAnimation, NULL);
+                pthread_create(&thread, NULL, &playerTakeDmgAnimation, NULL);
                 // pthread_mutex_unlock(&lockHero);
 
                 pthread_mutex_lock(&Coords[lockIdx].lock);

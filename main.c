@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     close1 = 0;
 
     pthread_create(&Hero.heroAction, NULL, &heroActions, NULL);
-    heroHealth = 10;
+    heroHealth = 5;
     heroAttack = 1;
     hasWon = 0;
     fillMonsterArray(MAP);
@@ -125,9 +125,16 @@ int main(int argc, char *argv[])
     drawMap(size);
 
     // ================== Sonido ==================
-    // Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-    // backgroundMusic = Mix_LoadMUS("./Music/song1.wav");
-    // Mix_PlayMusic(backgroundMusic, -1);
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
+    backgroundMusic = Mix_LoadMUS("./Music/background.mp3");
+    Mix_VolumeMusic(30);
+    Mix_PlayMusic(backgroundMusic, -1);
+
+    openChestSound = Mix_LoadWAV("./Music/openChest.wav");
+    playerTakeDmgSound = Mix_LoadWAV("./Music/playerTakeDmg.mp3");
+    ratTakeDmgSound = Mix_LoadWAV("./Music/ratTakeDmg.wav");
+    winSound = Mix_LoadWAV("./Music/win.wav");
+    loseSound = Mix_LoadWAV("./Music/lose.wav");
 
     gameStarted = 1;
 
@@ -137,7 +144,7 @@ int main(int argc, char *argv[])
     SDL_FreeSurface(background_Surface);
     SDL_Rect background_Rect;
     SDL_QueryTexture(background_Texture, NULL, NULL, &background_Rect.w, &background_Rect.h);
-    background_Rect.w = size * ROOM_SIZE;
+    background_Rect.w = (size * ROOM_SIZE) + 20 + ICON_SIZE;
     background_Rect.h = size * ROOM_SIZE;
     background_Rect.x = 0;
     background_Rect.y = 0;
@@ -368,7 +375,7 @@ int main(int argc, char *argv[])
         SDL_FreeSurface(health_Text_Surface);
         SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
 
-                if (playerTakeDamage)
+        if (playerTakeDamage)
         {
             SDL_RenderCopy(rend, ratAttack_Texture, NULL, &ratAttack_Rect);
         }
@@ -388,11 +395,16 @@ int main(int argc, char *argv[])
         SDL_Delay(1000 / 30);
         if (heroHealth <= 0)
         {
+            Mix_VolumeChunk(playerTakeDmgSound, 0);
+            Mix_FreeMusic(backgroundMusic);
+            Mix_PlayChannel(-1, loseSound, 0);
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", "You lost the game", NULL);
             close1 = 1;
         }
         else if (hasWon)
         {
+            Mix_FreeMusic(backgroundMusic);
+            Mix_PlayChannel(-1, winSound, 0);
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", "You won the game", NULL);
             close1 = 1;
         }

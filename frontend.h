@@ -14,9 +14,15 @@
 
 SDL_Renderer *rend;
 SDL_Surface *surface;
-Mix_Music *backgroundMusic;
 TTF_Font *font;
 char text[5];
+
+Mix_Music *backgroundMusic;
+Mix_Chunk *openChestSound;
+Mix_Chunk *playerTakeDmgSound;
+Mix_Chunk *ratTakeDmgSound;
+Mix_Chunk *winSound;
+Mix_Chunk *loseSound;
 
 int chestPlayerPosX;
 int chestPlayerPosY;
