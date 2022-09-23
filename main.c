@@ -306,11 +306,14 @@ int main(int argc, char *argv[])
         // SDL_RenderCopy(rend, tex, NULL, &dest);
         if (flagTrapActivated || flagTreasurePicked)
         {
-            pthread_mutex_lock(&lockMAP);
+            int lockIdx = getRoomLockIdx(player1.hitbox.y / ROOM_SIZE, player1.hitbox.x / ROOM_SIZE);
+            pthread_mutex_lock(&Coords[lockIdx].lock);
+            // pthread_mutex_lock(&lockMap);
             renderRoom(size, player1.hitbox.x, player1.hitbox.y);
             flagTrapActivated = 0;
             flagTreasurePicked = 0;
-            pthread_mutex_unlock(&lockMAP);
+            pthread_mutex_unlock(&Coords[lockIdx].lock);
+            // pthread_mutex_unlock(&lockMap);
         }
         renderMap(size); // render map
         renderRat(size);

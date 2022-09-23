@@ -42,6 +42,7 @@ typedef struct roomCoords
 {
     int axisX;
     int axisY;
+    pthread_mutex_t lock;
 } roomCoord;
 
 typedef struct HEROES
@@ -62,8 +63,6 @@ typedef struct MONSTERS
     SDL_Rect hitbox;
     pthread_t action;
 } MONSTER;
-pthread_mutex_t lockMAP;
-pthread_mutex_t lockHero;
 
 roomCoord *Coords;
 HEROE Hero;

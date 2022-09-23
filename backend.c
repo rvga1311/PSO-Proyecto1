@@ -3,6 +3,18 @@
 
 UserHeroAction lastUserAction = IDLE;
 
+int getRoomLockIdx(int x, int y)
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (Coords[i].axisX == x && Coords[i].axisY == y)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void *monstersActions(void *imMonster)
 {
     MONSTER *actualMonster = (MONSTER *)imMonster;
@@ -86,8 +98,12 @@ void *monstersActions(void *imMonster)
                 }
             }
 
+            int lockIdx = getRoomLockIdx(newX, newY);
+
             // se bloquea el MAP
-            pthread_mutex_lock(&lockMAP);
+            // printf("INDEX: %d\n", lockIdx);
+
+            pthread_mutex_lock(&Coords[lockIdx].lock);
             if (MAP[newX][newY].hasMonster == 0)
             {
                 MAP[newX][newY].hasMonster = 1;
@@ -97,7 +113,7 @@ void *monstersActions(void *imMonster)
                 actualMonster->hitbox.x = newY * ROOM_SIZE;
                 actualMonster->hitbox.y = newX * ROOM_SIZE;
             }
-            pthread_mutex_unlock(&lockMAP);
+            pthread_mutex_unlock(&Coords[lockIdx].lock);
         }
 
         // SE PONE A MIMIR
@@ -554,7 +570,8 @@ void *heroActions()
     {
         // Input();
         // pthread_mutex_lock(&lockMAP);
-        int actualRoom = 0;
+        // int actualRoom = 0;
+        int lockIdx = getRoomLockIdx(Hero.positionX, Hero.positionY);
         // printf("Las Action %d\n", lastUserAction);
         switch (lastUserAction)
         {
@@ -572,36 +589,36 @@ void *heroActions()
                 else
                 {
                     // lock heroHealth
-                    pthread_mutex_lock(&lockHero);
+                    // pthread_mutex_lock(&lockHero);
                     heroHealth++;
                     player1.health_points++;
-                    pthread_mutex_unlock(&lockHero);
+                    // pthread_mutex_unlock(&lockHero);
                     // printf("You didn't find any treasure!\n");
                 }
-                pthread_mutex_lock(&lockMAP);
+                pthread_mutex_lock(&Coords[lockIdx].lock);
                 flagTrapActivated = 0;
                 flagTreasurePicked = 1;
                 MAP[Hero.positionX][Hero.positionY].hasTreasure = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTreasure = 1;
-                pthread_mutex_unlock(&lockMAP);
+                pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             else if (MAP[Hero.positionX][Hero.positionY].hasTrap == 1)
             {
                 // printf("You stepped on a trap!\n");
-                pthread_mutex_lock(&lockHero);
+                // pthread_mutex_lock(&lockHero);
                 heroHealth--;
                 player1.health_points--;
 
                 pthread_t thread;
                 pthread_create(&thread, NULL, &damageAnimation, NULL);
-                pthread_mutex_unlock(&lockHero);
+                // pthread_mutex_unlock(&lockHero);
 
-                pthread_mutex_lock(&lockMAP);
+                pthread_mutex_lock(&Coords[lockIdx].lock);
                 flagTrapActivated = 1;
                 flagTreasurePicked = 0;
                 MAP[Hero.positionX][Hero.positionY].hasTrap = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTrap = 1;
-                pthread_mutex_unlock(&lockMAP);
+                pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
@@ -615,7 +632,8 @@ void *heroActions()
                 pthread_t thread;
                 pthread_create(&thread, NULL, &damageAnimation, NULL);
 
-                if (monster->health == 0) {
+                if (monster->health == 0)
+                {
                     MAP[monster->positionX][monster->positionY].hasMonster = 0;
                     monster->positionX = -1;
                     monster->positionY = -1;
@@ -632,47 +650,50 @@ void *heroActions()
         case MOVE_LEFT:
             if (Hero.positionY > 0 && MAP[Hero.positionX][Hero.positionY - 1].isVoid != 1 && isOtherMonsterThere(Hero.positionX, Hero.positionY - 1) == 0)
             {
-                pthread_mutex_lock(&lockMAP);
+                // pthread_mutex_lock(&Coords[lockIdx].lock);
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionY--;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                pthread_mutex_unlock(&lockMAP);
+                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
         case MOVE_RIGHT:
             if (Hero.positionY < size - 1 && MAP[Hero.positionX][Hero.positionY + 1].isVoid != 1 && isOtherMonsterThere(Hero.positionX, Hero.positionY + 1) == 0)
             {
-                pthread_mutex_lock(&lockMAP);
+                // pthread_mutex_lock(&Coords[lockIdx].lock);
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionY++;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                pthread_mutex_unlock(&lockMAP);
+                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
         case MOVE_UP:
             if (Hero.positionX > 0 && MAP[Hero.positionX - 1][Hero.positionY].isVoid != 1 && isOtherMonsterThere(Hero.positionX - 1, Hero.positionY) == 0)
             {
-
-                pthread_mutex_lock(&lockMAP);
+                // pthread_mutex_lock(&Coords[lockIdx].lock);
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionX--;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                pthread_mutex_unlock(&lockMAP);
+                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
         case MOVE_DOWN:
             if (Hero.positionX < size - 1 && MAP[Hero.positionX + 1][Hero.positionY].isVoid != 1 && isOtherMonsterThere(Hero.positionX + 1, Hero.positionY) == 0)
             {
-                pthread_mutex_lock(&lockMAP);
+                // pthread_mutex_lock(&Coords[lockIdx].lock);
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionX++;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                pthread_mutex_unlock(&lockMAP);
+                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
+            break;
+        case IDLE:
+            break;
+        case QUIT:
             break;
         }
 
