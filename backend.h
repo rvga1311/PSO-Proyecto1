@@ -69,6 +69,7 @@ HEROE Hero;
 MONSTER *monsterArray;
 ROOM **MAP;
 UserHeroAction lastUserAction;
+pthread_mutex_t lockHero;
 
 int heroHealth;
 int heroAttack;
@@ -77,6 +78,7 @@ int hasWon;
 int flagTreasurePicked;
 int flagTrapActivated;
 int playerTakeDamage;
+int playerAttackRat;
 
 int isNotVoid(int x, int y);
 int isOtherMonsterThere(int x, int y);
@@ -88,6 +90,7 @@ int whichMonster();
 int isOtherMonsterThere(int x, int y);
 ROOM **fillMonsterArray(ROOM **matrix);
 int checkIfSurrounded(int x, int y);
+int checkIfSurroundedByEntrance(int x, int y);
 int checkIfOccupied(int x, int y);
 void pushIntCoords(int x, int y);
 ;

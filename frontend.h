@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
 #include "backend.h"
@@ -13,8 +14,12 @@
 
 SDL_Renderer *rend;
 SDL_Surface *surface;
+Mix_Music *backgroundMusic;
 TTF_Font *font;
 char text[5];
+
+int chestPlayerPosX;
+int chestPlayerPosY;
 
 int gameStarted;
 
@@ -42,12 +47,13 @@ struct room
     int j;
 };
 struct room *rooms;
+struct room *emptyRooms;
 void drawplayer();
 void renderMap(int size);
 int valid_move(int val[2], int size, int array[30][2]);
 void drawMap(int size);
 void destroyMap(int size);
-void renderRoom(int size, int x, int y);
+void renderRoom(int size);
 void renderRat(int size);
 
 #endif

@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     flagTrapActivated = 0;
     flagTreasurePicked = 0;
     playerTakeDamage = 0;
+    playerAttackRat = 0;
     srand(time(0));
 
     while (size == 0)
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
     close1 = 0;
 
     pthread_create(&Hero.heroAction, NULL, &heroActions, NULL);
-    heroHealth = 5;
+    heroHealth = 10;
     heroAttack = 1;
     hasWon = 0;
     fillMonsterArray(MAP);
@@ -89,6 +90,8 @@ int main(int argc, char *argv[])
     }
     // Malloc rooms struct
     rooms = malloc(sizeof(struct room) * size);
+
+    emptyRooms = malloc(sizeof(struct room) * (size * size - size));
 
     pthread_t playerControlThread;
 
@@ -107,7 +110,7 @@ int main(int argc, char *argv[])
     SDL_Window *win = SDL_CreateWindow("GAME", // creates a window
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       (size * ROOM_SIZE) + 10 + ICON_SIZE, size * ROOM_SIZE, 0);
+                                       (size * ROOM_SIZE) + 20 + ICON_SIZE, size * ROOM_SIZE, 0);
     SDL_SetWindowResizable(win, SDL_FALSE);
 
     // triggers the program that controls
@@ -119,11 +122,25 @@ int main(int argc, char *argv[])
 
     player1.sprite = "./Images/Hero/SpriteF.png";
     player1.positions_Num = size;
-    player1.health_points = heroHealth;
-    player1.attack_points = heroAttack;
     drawMap(size);
 
+    // ================== Sonido ==================
+    // Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+    // backgroundMusic = Mix_LoadMUS("./Music/song1.wav");
+    // Mix_PlayMusic(backgroundMusic, -1);
+
     gameStarted = 1;
+
+    // background
+    SDL_Surface *background_Surface = IMG_Load("./Images/Room/background.png");
+    SDL_Texture *background_Texture = SDL_CreateTextureFromSurface(rend, background_Surface);
+    SDL_FreeSurface(background_Surface);
+    SDL_Rect background_Rect;
+    SDL_QueryTexture(background_Texture, NULL, NULL, &background_Rect.w, &background_Rect.h);
+    background_Rect.w = size * ROOM_SIZE;
+    background_Rect.h = size * ROOM_SIZE;
+    background_Rect.x = 0;
+    background_Rect.y = 0;
 
     // Icono de espada
     SDL_Surface *attack_Icon_Surface = IMG_Load("./Images/Misc/sword.png");
@@ -133,7 +150,7 @@ int main(int argc, char *argv[])
     SDL_QueryTexture(attack_Icon_Texture, NULL, NULL, &attack_Icon_Rect.w, &attack_Icon_Rect.h);
     attack_Icon_Rect.w = ICON_SIZE;
     attack_Icon_Rect.h = ICON_SIZE;
-    attack_Icon_Rect.x = size * ROOM_SIZE;
+    attack_Icon_Rect.x = size * ROOM_SIZE + 10;
     attack_Icon_Rect.y = 0;
     SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect);
 
@@ -143,7 +160,7 @@ int main(int argc, char *argv[])
     SDL_Texture *attack_Text_Texture = SDL_CreateTextureFromSurface(rend, attack_Text_Surface);
     SDL_FreeSurface(attack_Text_Surface);
     SDL_Rect attack_Text_Texture_rect;                               // create a rect
-    attack_Text_Texture_rect.x = size * ROOM_SIZE + 5;               // controls the rect's x coordinate
+    attack_Text_Texture_rect.x = size * ROOM_SIZE + 15;              // controls the rect's x coordinate
     attack_Text_Texture_rect.y = attack_Icon_Rect.y + ICON_SIZE + 5; // controls the rect's y coordinte
     attack_Text_Texture_rect.w = ICON_SIZE - 10;                     // controls the width of the rect
     attack_Text_Texture_rect.h = ICON_SIZE - 10;                     // controls the height of the rect
@@ -157,7 +174,7 @@ int main(int argc, char *argv[])
     SDL_QueryTexture(health_Icon_Texture, NULL, NULL, &health_Icon_Rect.w, &health_Icon_Rect.h);
     health_Icon_Rect.w = ICON_SIZE;
     health_Icon_Rect.h = ICON_SIZE;
-    health_Icon_Rect.x = size * ROOM_SIZE;
+    health_Icon_Rect.x = size * ROOM_SIZE + 10;
     health_Icon_Rect.y = attack_Text_Texture_rect.y + ICON_SIZE + 25;
     SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &health_Icon_Rect);
 
@@ -167,20 +184,32 @@ int main(int argc, char *argv[])
     SDL_Texture *health_Text_Texture = SDL_CreateTextureFromSurface(rend, health_Text_Surface);
     SDL_FreeSurface(health_Text_Surface);
     SDL_Rect health_Text_Rect;                               // create a rect
-    health_Text_Rect.x = size * ROOM_SIZE + 5;               // controls the rect's x coordinate
+    health_Text_Rect.x = size * ROOM_SIZE + 15;              // controls the rect's x coordinate
     health_Text_Rect.y = health_Icon_Rect.y + ICON_SIZE + 5; // controls the rect's y coordinte
     health_Text_Rect.w = ICON_SIZE - 10;                     // controls the width of the rect
     health_Text_Rect.h = ICON_SIZE - 10;                     // controls the height of the rect
     SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
 
-    // Icono de espada
-    SDL_Surface *damagePlayer_Surface = IMG_Load("./Images/Misc/sword.png");
-    SDL_Texture *damagePlayer_Texture = SDL_CreateTextureFromSurface(rend, damagePlayer_Surface);
-    SDL_FreeSurface(damagePlayer_Surface);
-    SDL_Rect damagePlayer_Rect;
-    SDL_QueryTexture(damagePlayer_Texture, NULL, NULL, &damagePlayer_Rect.w, &damagePlayer_Rect.h);
-    damagePlayer_Rect.w = ICON_SIZE - 10;
-    damagePlayer_Rect.h = ICON_SIZE - 10;
+    // Rata hace daño
+    SDL_Surface *ratAttack_Surface = IMG_Load("./Images/Misc/RatDamage.png");
+    SDL_Texture *ratAttack_Texture = SDL_CreateTextureFromSurface(rend, ratAttack_Surface);
+    SDL_FreeSurface(ratAttack_Surface);
+    SDL_Rect ratAttack_Rect;
+    SDL_QueryTexture(ratAttack_Texture, NULL, NULL, &ratAttack_Rect.w, &ratAttack_Rect.h);
+    ratAttack_Rect.w = ICON_SIZE + 10;
+    ratAttack_Rect.h = ICON_SIZE + 10;
+    ratAttack_Rect.x = health_Icon_Rect.x - 5;
+    ratAttack_Rect.y = health_Icon_Rect.y - 5;
+
+    // Jugador hace daño
+    SDL_Surface *playerAttack_Surface = IMG_Load("./Images/Misc/sword.png");
+    SDL_Texture *playerAttack_Texture = SDL_CreateTextureFromSurface(rend, playerAttack_Surface);
+    SDL_FreeSurface(playerAttack_Surface);
+    SDL_Rect playerAttack_Rect;
+    SDL_QueryTexture(playerAttack_Texture, NULL, NULL, &playerAttack_Rect.w, &playerAttack_Rect.h);
+    playerAttack_Rect.w = ICON_SIZE - 10;
+    playerAttack_Rect.h = ICON_SIZE - 10;
+    SDL_RenderCopy(rend, playerAttack_Texture, NULL, &playerAttack_Rect);
 
     // controls animation loop
 
@@ -303,13 +332,16 @@ int main(int argc, char *argv[])
 
         // clears the screen
         SDL_RenderClear(rend);
+
+        SDL_RenderCopy(rend, background_Texture, NULL, &background_Rect);
+
         // SDL_RenderCopy(rend, tex, NULL, &dest);
         if (flagTrapActivated || flagTreasurePicked)
         {
-            int lockIdx = getRoomLockIdx(player1.hitbox.y / ROOM_SIZE, player1.hitbox.x / ROOM_SIZE);
+            int lockIdx = getRoomLockIdx(chestPlayerPosX / ROOM_SIZE, chestPlayerPosY / ROOM_SIZE);
             pthread_mutex_lock(&Coords[lockIdx].lock);
             // pthread_mutex_lock(&lockMap);
-            renderRoom(size, player1.hitbox.x, player1.hitbox.y);
+            renderRoom(size);
             flagTrapActivated = 0;
             flagTreasurePicked = 0;
             pthread_mutex_unlock(&Coords[lockIdx].lock);
@@ -320,15 +352,8 @@ int main(int argc, char *argv[])
         drawplayer();                                                       // render player
         SDL_RenderCopy(rend, attack_Icon_Texture, NULL, &attack_Icon_Rect); // render attack icon
 
-        if (playerTakeDamage)
-        {
-            damagePlayer_Rect.x = player1.hitbox.x;
-            damagePlayer_Rect.y = player1.hitbox.y;
-            SDL_RenderCopy(rend, damagePlayer_Texture, NULL, &damagePlayer_Rect);
-        }
-
         // render attack points
-        sprintf(text, "%d", player1.attack_points);
+        sprintf(text, "%d", heroAttack);
         attack_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
         attack_Text_Texture = SDL_CreateTextureFromSurface(rend, attack_Text_Surface);
         SDL_FreeSurface(attack_Text_Surface);
@@ -337,11 +362,23 @@ int main(int argc, char *argv[])
         SDL_RenderCopy(rend, health_Icon_Texture, NULL, &health_Icon_Rect); // render health icon
 
         // render health points
-        sprintf(text, "%d", player1.health_points);
+        sprintf(text, "%d", heroHealth);
         health_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
         health_Text_Texture = SDL_CreateTextureFromSurface(rend, health_Text_Surface);
         SDL_FreeSurface(health_Text_Surface);
         SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
+
+                if (playerTakeDamage)
+        {
+            SDL_RenderCopy(rend, ratAttack_Texture, NULL, &ratAttack_Rect);
+        }
+
+        if (playerAttackRat)
+        {
+            playerAttack_Rect.x = player1.hitbox.x;
+            playerAttack_Rect.y = player1.hitbox.y;
+            SDL_RenderCopy(rend, playerAttack_Texture, NULL, &playerAttack_Rect);
+        }
 
         // triggers the double buffers
         // for multiple rendering

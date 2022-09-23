@@ -1,6 +1,11 @@
 {
-    "files.associations": {
-        "sdl_ttf.h": "c",
-        "sdl_image.h": "c"
-    }
+  "files.associations": {
+    "sdl_ttf.h": "c",
+    "sdl_image.h": "c",
+    "array": "c",
+    "deque": "c",
+    "string": "c",
+    "vector": "c",
+    "string_view": "c"
+  }
 }

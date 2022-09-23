@@ -1,7 +1,8 @@
 # Compilador
 CC := gcc
 # Flags de compilación
-CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lSDL2_ttf -lpthread -lSDL2_image $(shell sdl2-config --cflags) -Wall -O
+SLDFLAGS := -lSDL2_image -lSDL2_ttf -lSDL2_mixer
+CFLAGS := `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c11 -Wall -lpthread  $(SLDFLAGS) $(shell sdl2-config --cflags) -Wall -O
 # Archivos.h
 HEADERS := frontend.h backend.h
 # Archivo main

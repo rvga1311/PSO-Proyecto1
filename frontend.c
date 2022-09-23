@@ -54,11 +54,11 @@ int valid_move(int val[2], int size, int array[30][2])
     return 0;
 }
 
-void renderRoom(int size, int x, int y)
+void renderRoom(int size)
 {
     for (int i = 0; i < size; i++)
     {
-        if (rooms[i].location.x == x && rooms[i].location.y == y)
+        if (rooms[i].location.x == chestPlayerPosX && rooms[i].location.y == chestPlayerPosY)
         {
             // printf("flags treasure %d, trap %d\n", flagTreasurePicked, flagTrapActivated);
             if (flagTreasurePicked)
@@ -138,6 +138,7 @@ void drawMap(int size)
 
                 counter++;
             }
+
             currentX += ROOM_SIZE;
         }
         currentX = 0;

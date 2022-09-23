@@ -18,6 +18,7 @@ int getRoomLockIdx(int x, int y)
 void *monstersActions(void *imMonster)
 {
     MONSTER *actualMonster = (MONSTER *)imMonster;
+    pthread_t ratDamageThread;
     while (1)
     {
 
@@ -26,23 +27,17 @@ void *monstersActions(void *imMonster)
         int newY;
         // DECIDE PARA DONDE MOVERSE
         int newDirection;
+        int flagMoved = 0;
+        int flagAttack = 0;
         int keepGoing = 0;
         if (actualMonster->positionX == Hero.positionX && actualMonster->positionY == Hero.positionY)
         {
 
-            pthread_t thread;
-            pthread_create(&thread, NULL, &damageAnimation, NULL);
-
-            // lock Health
-            // pthread_mutex_lock(&lockHero);
             // ATACAR
             heroHealth -= 1;
-            player1.health_points -= 1;
-            sleepTime *= 10;
+            flagAttack = 1;
 
-            // printf("El heroe ha sido atacado por un monstruo y ahora tiene %d de vida\n", heroHealth);
-            // unlock
-            // pthread_mutex_unlock(&lockHero);
+            pthread_create(&ratDamageThread, NULL, &damageAnimation, NULL);
         }
         else
         {
@@ -59,6 +54,7 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX + 1;
                         newY = actualMonster->positionY;
                         keepGoing = 1;
+                        flagMoved = 1;
                     }
                     break;
                     // MOVERSE ARRIBA
@@ -69,6 +65,7 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX - 1;
                         newY = actualMonster->positionY;
                         keepGoing = 1;
+                        flagMoved = 1;
                     }
                     break;
                     // MOVERSE A LA DERECHA
@@ -79,6 +76,7 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX;
                         newY = actualMonster->positionY + 1;
                         keepGoing = 1;
+                        flagMoved = 1;
                     }
                     break;
                     // MOVERSE A LA IZQUIERDA
@@ -90,6 +88,7 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX;
                         newY = actualMonster->positionY - 1;
                         keepGoing = 1;
+                        flagMoved = 1;
                     }
                     break;
 
@@ -117,10 +116,22 @@ void *monstersActions(void *imMonster)
         }
 
         // SE PONE A MIMIR
-
-        actualMonster->isResting = 1;
-        usleep((sleepTime + 2) * 100000);
-        actualMonster->isResting = 0;
+        if (flagMoved == 1)
+        {
+            actualMonster->isResting = 1;
+            usleep((sleepTime + 2) * 100000);
+            actualMonster->isResting = 0;
+            flagMoved = 0;
+            flagAttack = 0;
+        }
+        else if (flagAttack == 1)
+        {
+            actualMonster->isResting = 1;
+            sleep(1);
+            actualMonster->isResting = 0;
+            flagAttack = 0;
+            flagMoved = 0;
+        }
 
         // YA SE LEVANTÓ
     }
@@ -201,6 +212,14 @@ ROOM **fillMonsterArray(ROOM **matrix)
         }
     }
     return matrix;
+}
+
+int checkIfSurroundedByEntrance(int x, int y)
+{
+    if (Coords[0].axisX == x && Coords[0].axisY == y)
+        return 1;
+
+    return 0;
 }
 
 int checkIfSurrounded(int x, int y)
@@ -291,6 +310,15 @@ ROOM **createMatrix()
 
     ROOM baseRoom;
     baseRoom.isVoid = 1;
+    baseRoom.isBeginning = 0;
+    baseRoom.isEnd = 0;
+    baseRoom.hasTreasure = 0;
+    baseRoom.hadTreasure = 0;
+    baseRoom.hasTrap = 0;
+    baseRoom.hadTrap = 0;
+    baseRoom.hasHero = 0;
+    baseRoom.hasMonster = 0;
+
     // create a vector for roomCoord
     Coords = malloc(size * sizeof(roomCoord));
     instanceCoords();
@@ -465,10 +493,6 @@ ROOM **createMatrix()
         randomEnd = randomNumber(size);
         if (randomEnd == size - 1)
             randomEnd--;
-        else if (randomEnd == 0)
-        {
-            randomEnd = 3;
-        }
 
         x = Coords[randomEnd].axisX;
         y = Coords[randomEnd].axisY;
@@ -480,7 +504,7 @@ ROOM **createMatrix()
             if (x > 0)
             {
                 x--;
-                if (x > -1 && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3))
+                if (x > -1 && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3) && checkIfSurroundedByEntrance(x + 1, y) == 0 && checkIfSurroundedByEntrance(x - 1, y) == 0 && checkIfSurroundedByEntrance(x, y + 1) == 0 && checkIfSurroundedByEntrance(x, y - 1) == 0)
                 {
                     matrix[x][y].isVoid = 0;
                     matrix[x][y].isEnd = 1;
@@ -499,7 +523,7 @@ ROOM **createMatrix()
             if (x < size - 1)
             {
                 x++;
-                if (x < size && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3))
+                if (x < size && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3) && checkIfSurroundedByEntrance(x + 1, y) == 0 && checkIfSurroundedByEntrance(x - 1, y) == 0 && checkIfSurroundedByEntrance(x, y + 1) == 0 && checkIfSurroundedByEntrance(x, y - 1) == 0)
                 {
                     matrix[x][y].isVoid = 0;
                     matrix[x][y].isEnd = 1;
@@ -518,7 +542,7 @@ ROOM **createMatrix()
             if (y > 0)
             {
                 y--;
-                if (y > -1 && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3))
+                if (y > -1 && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3) && checkIfSurroundedByEntrance(x + 1, y) == 0 && checkIfSurroundedByEntrance(x - 1, y) == 0 && checkIfSurroundedByEntrance(x, y + 1) == 0 && checkIfSurroundedByEntrance(x, y - 1) == 0)
                 {
                     matrix[x][y].isVoid = 0;
                     matrix[x][y].isEnd = 1;
@@ -537,7 +561,7 @@ ROOM **createMatrix()
             if (y < size - 1)
             {
                 y++;
-                if (y < size && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3))
+                if (y < size && (checkIfOccupied(x, y) == 0) && (checkIfSurrounded(x, y) < 4) && (checkIfSurrounded(x + 1, y) < 3) && (checkIfSurrounded(x - 1, y) < 3) && (checkIfSurrounded(x, y + 1) < 3) && (checkIfSurrounded(x, y - 1) < 3) && checkIfSurroundedByEntrance(x + 1, y) == 0 && checkIfSurroundedByEntrance(x - 1, y) == 0 && checkIfSurroundedByEntrance(x, y + 1) == 0 && checkIfSurroundedByEntrance(x, y - 1) == 0)
                 {
                     matrix[x][y].isVoid = 0;
                     matrix[x][y].isEnd = 1;
@@ -563,8 +587,17 @@ void *damageAnimation(void *arg)
     pthread_exit(NULL);
 }
 
+void *playerAttackAnimation(void *arg)
+{
+    playerAttackRat = 1;
+    sleep(1);
+    playerAttackRat = 0;
+    pthread_exit(NULL);
+}
+
 void *heroActions()
 {
+    pthread_t playerAttackThread;
     // lock MAP
     while (1)
     {
@@ -601,6 +634,8 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hasTreasure = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTreasure = 1;
                 pthread_mutex_unlock(&Coords[lockIdx].lock);
+                chestPlayerPosX = Hero.positionY * ROOM_SIZE;
+                chestPlayerPosY = Hero.positionX * ROOM_SIZE;
             }
             else if (MAP[Hero.positionX][Hero.positionY].hasTrap == 1)
             {
@@ -619,6 +654,8 @@ void *heroActions()
                 MAP[Hero.positionX][Hero.positionY].hasTrap = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTrap = 1;
                 pthread_mutex_unlock(&Coords[lockIdx].lock);
+                chestPlayerPosX = Hero.positionY * ROOM_SIZE;
+                chestPlayerPosY = Hero.positionX * ROOM_SIZE;
             }
             lastUserAction = IDLE;
             break;
@@ -629,8 +666,8 @@ void *heroActions()
                 // lock monsterHealth
                 MONSTER *monster = &monsterArray[currentMonsterIdx];
                 monsterArray[currentMonsterIdx].health = monsterArray[currentMonsterIdx].health - heroAttack;
-                pthread_t thread;
-                pthread_create(&thread, NULL, &damageAnimation, NULL);
+
+                pthread_create(&playerAttackThread, NULL, &playerAttackAnimation, NULL);
 
                 if (monster->health == 0)
                 {
