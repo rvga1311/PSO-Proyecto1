@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
                     lastUserAction = PICK_TREASURE;
                     // printf("Player %d,%d\n", player1.hitbox.x / 33, player1.hitbox.y / 33);
                     break;
-                case SDL_SCANCODE_K:
+                case SDL_SCANCODE_SPACE:
                     lastUserAction = ATTACK;
                     break;
                 default:
