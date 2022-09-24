@@ -69,7 +69,6 @@ HEROE Hero;
 MONSTER *monsterArray;
 ROOM **MAP;
 UserHeroAction lastUserAction;
-pthread_mutex_t lockHero;
 
 int heroHealth;
 int heroAttack;

@@ -2,7 +2,6 @@
 
 int availableKeyboard;
 int close1;
-pthread_mutex_t lockKeyboard;
 struct room *rooms;
 int flagDrawMap;
 int gameStarted = 0;
@@ -399,8 +398,6 @@ int main(int argc, char *argv[])
     SDL_DestroyTexture(&attack_Text_Texture_rect);
     SDL_DestroyTexture(&health_Icon_Rect);
     SDL_DestroyTexture(&health_Text_Rect);
-
-    pthread_mutex_destroy(&lockKeyboard);
 
     // destroy renderer
     SDL_DestroyRenderer(rend);
