@@ -6,7 +6,6 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
-#include "backend.h"
 
 #define ROOM_SIZE 33
 #define PLAYER_SIZE 30
