@@ -37,4 +37,4 @@ run: $(EXEC)
 install_SDL2:
 	$(info Installing required dependencies for SDL2...)
 	sudo apt-get update -y
-	sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-image-2.0-0 libsdl2-ttf-dev libsdl-ttf2.0-0 libsdl2-mixer-dev libsdl2-mixer-2.0-0
+	sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-image-2.0-0 libsdl-ttf2.0-0 libsdl2-mixer-2.0-0
