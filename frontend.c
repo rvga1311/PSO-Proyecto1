@@ -60,7 +60,7 @@ void renderRoom(int size)
     {
         if (rooms[i].location.x == chestPlayerPosX && rooms[i].location.y == chestPlayerPosY)
         {
-            // printf("flags treasure %d, trap %d\n", flagTreasurePicked, flagTrapActivated);
+
             if (flagTreasurePicked)
             {
                 rooms[i].surface = IMG_Load("./Images/Room/RoomTreasureChest.jpg");
@@ -95,7 +95,6 @@ void drawMap(int size)
                 if (MAP[i][y].hasTrap == 1 || MAP[i][y].hasTreasure == 1)
                 {
                     rooms[counter].surface = IMG_Load("./Images/Room/RoomCloseChest.jpg");
-                    // printf("Chest %d, %d\n", y, i);
                 }
                 else if (MAP[i][y].isBeginning == 1)
                 {

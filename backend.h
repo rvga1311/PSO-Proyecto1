@@ -98,7 +98,6 @@ void instanceCoords();
 int randomNumber(int number);
 ROOM **createMatrix();
 void *heroActions();
-// int backend();
 void printMap();
 void *playerTakeDmgAnimation(void *arg);
 void *playerAttackAnimation(void *arg);

@@ -9,11 +9,10 @@ int gameStarted = 0;
 
 void *playerControlTime()
 {
-    pthread_mutex_lock(&lockKeyboard);
+
     availableKeyboard = 1;
     sleep(0.1);
     availableKeyboard = 0;
-    pthread_mutex_unlock(&lockKeyboard);
 
     pthread_exit(NULL);
 }
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
 
     while (size == 0)
     {
-        // print please enter a difficulty level
+
         printf("Please enter a difficulty level (1, 2, or 3): \n");
 
         int ret = scanf("%d", &difficulty);
@@ -102,22 +101,18 @@ int main(int argc, char *argv[])
     font = TTF_OpenFont("Montserrat-Regular.ttf", 20);
     SDL_Color WhiteFont = {255, 255, 255};
 
-    // returns zero on success else non-zero
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("error initializing SDL: %s\n", SDL_GetError());
     }
-    SDL_Window *win = SDL_CreateWindow("GAME", // creates a window
+    SDL_Window *win = SDL_CreateWindow("GAME",
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
                                        (size * ROOM_SIZE) + 20 + ICON_SIZE, size * ROOM_SIZE, 0);
     SDL_SetWindowResizable(win, SDL_FALSE);
 
-    // triggers the program that controls
-    // your graphics hardware and sets flags
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
 
-    // creates a renderer to render our images
     rend = SDL_CreateRenderer(win, -1, render_flags);
 
     player1.sprite = "./Images/Hero/SpriteF.png";
@@ -166,11 +161,11 @@ int main(int argc, char *argv[])
     SDL_Surface *attack_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
     SDL_Texture *attack_Text_Texture = SDL_CreateTextureFromSurface(rend, attack_Text_Surface);
     SDL_FreeSurface(attack_Text_Surface);
-    SDL_Rect attack_Text_Texture_rect;                               // create a rect
-    attack_Text_Texture_rect.x = size * ROOM_SIZE + 15;              // controls the rect's x coordinate
-    attack_Text_Texture_rect.y = attack_Icon_Rect.y + ICON_SIZE + 5; // controls the rect's y coordinte
-    attack_Text_Texture_rect.w = ICON_SIZE - 10;                     // controls the width of the rect
-    attack_Text_Texture_rect.h = ICON_SIZE - 10;                     // controls the height of the rect
+    SDL_Rect attack_Text_Texture_rect;
+    attack_Text_Texture_rect.x = size * ROOM_SIZE + 15;
+    attack_Text_Texture_rect.y = attack_Icon_Rect.y + ICON_SIZE + 5;
+    attack_Text_Texture_rect.w = ICON_SIZE - 10;
+    attack_Text_Texture_rect.h = ICON_SIZE - 10;
     SDL_RenderCopy(rend, attack_Text_Texture, NULL, &attack_Text_Texture_rect);
 
     // Icono de vida
@@ -190,11 +185,11 @@ int main(int argc, char *argv[])
     SDL_Surface *health_Text_Surface = TTF_RenderText_Solid(font, text, WhiteFont);
     SDL_Texture *health_Text_Texture = SDL_CreateTextureFromSurface(rend, health_Text_Surface);
     SDL_FreeSurface(health_Text_Surface);
-    SDL_Rect health_Text_Rect;                               // create a rect
-    health_Text_Rect.x = size * ROOM_SIZE + 15;              // controls the rect's x coordinate
-    health_Text_Rect.y = health_Icon_Rect.y + ICON_SIZE + 5; // controls the rect's y coordinte
-    health_Text_Rect.w = ICON_SIZE - 10;                     // controls the width of the rect
-    health_Text_Rect.h = ICON_SIZE - 10;                     // controls the height of the rect
+    SDL_Rect health_Text_Rect;
+    health_Text_Rect.x = size * ROOM_SIZE + 15;
+    health_Text_Rect.y = health_Icon_Rect.y + ICON_SIZE + 5;
+    health_Text_Rect.w = ICON_SIZE - 10;
+    health_Text_Rect.h = ICON_SIZE - 10;
     SDL_RenderCopy(rend, health_Text_Texture, NULL, &health_Text_Rect);
 
     // Rata hace daño
@@ -220,9 +215,6 @@ int main(int argc, char *argv[])
 
     // controls animation loop
 
-    // speed of box
-    // int speed = 300;
-
     // animation loop
     while (!close1)
     {
@@ -239,7 +231,6 @@ int main(int argc, char *argv[])
             {
 
             case SDL_QUIT:
-                // handling of close1 button
                 close1 = 1;
                 break;
 
@@ -302,7 +293,6 @@ int main(int argc, char *argv[])
                     break;
                 case SDL_SCANCODE_E:
                     lastUserAction = PICK_TREASURE;
-                    // printf("Player %d,%d\n", player1.hitbox.x / 33, player1.hitbox.y / 33);
                     break;
                 case SDL_SCANCODE_SPACE:
                     lastUserAction = ATTACK;
@@ -342,17 +332,11 @@ int main(int argc, char *argv[])
 
         SDL_RenderCopy(rend, background_Texture, NULL, &background_Rect);
 
-        // SDL_RenderCopy(rend, tex, NULL, &dest);
         if (flagTrapActivated || flagTreasurePicked)
         {
-            int lockIdx = getRoomLockIdx(chestPlayerPosX / ROOM_SIZE, chestPlayerPosY / ROOM_SIZE);
-            pthread_mutex_lock(&Coords[lockIdx].lock);
-            // pthread_mutex_lock(&lockMap);
             renderRoom(size);
             flagTrapActivated = 0;
             flagTreasurePicked = 0;
-            pthread_mutex_unlock(&Coords[lockIdx].lock);
-            // pthread_mutex_unlock(&lockMap);
         }
         renderMap(size); // render map
         renderRat(size);
@@ -387,15 +371,13 @@ int main(int argc, char *argv[])
             SDL_RenderCopy(rend, playerAttack_Texture, NULL, &playerAttack_Rect);
         }
 
-        // triggers the double buffers
-        // for multiple rendering
         SDL_RenderPresent(rend);
 
-        // calculates to 60 fps
         SDL_Delay(1000 / 30);
         if (heroHealth <= 0)
         {
             Mix_VolumeChunk(playerTakeDmgSound, 0);
+            Mix_VolumeChunk(openChestSound, 0);
             Mix_FreeMusic(backgroundMusic);
             Mix_PlayChannel(-1, loseSound, 0);
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", "You lost the game", NULL);
@@ -426,7 +408,6 @@ int main(int argc, char *argv[])
     // destroy window
     SDL_DestroyWindow(win);
 
-    // close1 SDL
     SDL_Quit();
 
     return 0;

@@ -54,7 +54,6 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX + 1;
                         newY = actualMonster->positionY;
                         keepGoing = 1;
-                        flagMoved = 1;
                     }
                     break;
                     // MOVERSE ARRIBA
@@ -65,7 +64,6 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX - 1;
                         newY = actualMonster->positionY;
                         keepGoing = 1;
-                        flagMoved = 1;
                     }
                     break;
                     // MOVERSE A LA DERECHA
@@ -76,7 +74,6 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX;
                         newY = actualMonster->positionY + 1;
                         keepGoing = 1;
-                        flagMoved = 1;
                     }
                     break;
                     // MOVERSE A LA IZQUIERDA
@@ -88,7 +85,6 @@ void *monstersActions(void *imMonster)
                         newX = actualMonster->positionX;
                         newY = actualMonster->positionY - 1;
                         keepGoing = 1;
-                        flagMoved = 1;
                     }
                     break;
 
@@ -100,25 +96,25 @@ void *monstersActions(void *imMonster)
             int lockIdx = getRoomLockIdx(newX, newY);
 
             // se bloquea el MAP
-            // printf("INDEX: %d\n", lockIdx);
 
             pthread_mutex_lock(&Coords[lockIdx].lock);
             if (MAP[newX][newY].hasMonster == 0)
             {
+                flagMoved = 1;
                 MAP[newX][newY].hasMonster = 1;
                 MAP[actualMonster->positionX][actualMonster->positionY].hasMonster = 0;
-                actualMonster->positionX = newX;
-                actualMonster->positionY = newY;
-                actualMonster->hitbox.x = newY * ROOM_SIZE;
-                actualMonster->hitbox.y = newX * ROOM_SIZE;
             }
             pthread_mutex_unlock(&Coords[lockIdx].lock);
         }
 
-        // SE PONE A MIMIR
         if (flagMoved == 1)
         {
+            actualMonster->positionX = newX;
+            actualMonster->positionY = newY;
+            actualMonster->hitbox.x = newY * ROOM_SIZE;
+            actualMonster->hitbox.y = newX * ROOM_SIZE;
             actualMonster->isResting = 1;
+
             usleep((sleepTime + 2) * 100000);
             actualMonster->isResting = 0;
             flagMoved = 0;
@@ -132,8 +128,6 @@ void *monstersActions(void *imMonster)
             flagAttack = 0;
             flagMoved = 0;
         }
-
-        // YA SE LEVANTÓ
     }
 }
 
@@ -185,9 +179,7 @@ int isOtherMonsterThere(int x, int y)
 
 ROOM **fillMonsterArray(ROOM **matrix)
 {
-    // printw("CREANDO MONSTRUOS\n");
     monsterArray = (MONSTER *)malloc((size / 2) * sizeof(MONSTER));
-    // printw("FINAL MONSTRUOS \n");
     int monstersCreated = 0;
     int randomPosition;
     while (monstersCreated < (size / 2))
@@ -298,7 +290,6 @@ void instanceCoords()
 
 int randomNumber(int number)
 {
-    // choose a random value between 0 and size
 
     int random = rand() % number;
     return random;
@@ -306,7 +297,6 @@ int randomNumber(int number)
 
 ROOM **createMatrix()
 {
-    // instance struct ROOM
 
     ROOM baseRoom;
     baseRoom.isVoid = 1;
@@ -319,10 +309,8 @@ ROOM **createMatrix()
     baseRoom.hasHero = 0;
     baseRoom.hasMonster = 0;
 
-    // create a vector for roomCoord
     Coords = malloc(size * sizeof(roomCoord));
     instanceCoords();
-    // create a matrix size of difficulty in dynamic memory
     ROOM **matrix = (ROOM **)malloc(size * sizeof(ROOM *));
     for (int i = 0; i < size; i++)
         matrix[i] = (ROOM *)malloc(size * sizeof(ROOM));
@@ -348,25 +336,19 @@ ROOM **createMatrix()
     int instanciatedRooms = 1;
     while (instanciatedRooms < size - 1)
     {
-        // usleep(10000);
-        //  // printw("RANDOM NUM - \n");
-        //  refresh();
+
         RandomRoom = randomNumber(instanciatedRooms);
-        // printf("RANDOM NUM - %d\n", RandomRoom);
+
         if (RandomRoom == size - 1)
             RandomRoom--;
 
         x = Coords[RandomRoom].axisX;
         y = Coords[RandomRoom].axisY;
-        // create a path from the first room to the last room
+
         random1 = randomNumber(4);
         random2 = randomNumber(10);
         if (random1 == 0)
         {
-            // printw("RANDOM 0 with x: %d and y: %d- \n", x, y);
-            // refresh();
-
-            // move up
 
             if (x > 0)
             {
@@ -394,9 +376,6 @@ ROOM **createMatrix()
         }
         if (random1 == 1)
         {
-            // move down
-            // printw("RANDOM 1 with x: %d and y: %d- \n", x, y);
-            // refresh();
 
             if (x < size - 1)
             {
@@ -424,9 +403,6 @@ ROOM **createMatrix()
         }
         if (random1 == 2)
         {
-            // move left
-            // printw("RANDOM 2 with x: %d and y: %d- \n", x, y);
-            // refresh();
 
             if (y > 0)
             {
@@ -454,9 +430,7 @@ ROOM **createMatrix()
         }
         if (random1 == 3)
         {
-            // move right
-            // printw("RANDOM 3 with x: %d and y: %d- \n", x, y);
-            // refresh();
+
             if (y < size - 1)
             {
                 y++;
@@ -481,7 +455,6 @@ ROOM **createMatrix()
             }
         }
     }
-    // printw("FINAL CAMINO\n");
 
     //------------------end of path creation------------------//
     sleep(1);
@@ -603,61 +576,51 @@ void *heroActions()
     // lock MAP
     while (1)
     {
-        // Input();
-        // pthread_mutex_lock(&lockMAP);
-        // int actualRoom = 0;
+
         int lockIdx = getRoomLockIdx(Hero.positionX, Hero.positionY);
-        // printf("Las Action %d\n", lastUserAction);
+
         switch (lastUserAction)
         {
         case PICK_TREASURE:
-            // printf("Pos %d %d\n", Hero.positionX, Hero.positionY);
+
             if (MAP[player1.hitbox.y / ROOM_SIZE][player1.hitbox.x / ROOM_SIZE].hasTreasure == 1)
             {
                 Mix_PlayChannel(-1, openChestSound, 0);
                 int treasureType = rand() % 2;
                 if (treasureType)
                 {
-                    // printf("You found a treasure!\n");
+
                     heroAttack++;
                     player1.attack_points++;
                 }
                 else
                 {
-                    // lock heroHealth
-                    // pthread_mutex_lock(&lockHero);
+
                     heroHealth++;
                     player1.health_points++;
-                    // pthread_mutex_unlock(&lockHero);
-                    // printf("You didn't find any treasure!\n");
                 }
-                pthread_mutex_lock(&Coords[lockIdx].lock);
                 flagTrapActivated = 0;
                 flagTreasurePicked = 1;
                 MAP[Hero.positionX][Hero.positionY].hasTreasure = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTreasure = 1;
-                pthread_mutex_unlock(&Coords[lockIdx].lock);
                 chestPlayerPosX = Hero.positionY * ROOM_SIZE;
                 chestPlayerPosY = Hero.positionX * ROOM_SIZE;
             }
             else if (MAP[Hero.positionX][Hero.positionY].hasTrap == 1)
             {
                 Mix_PlayChannel(-1, openChestSound, 0);
-                // printf("You stepped on a trap!\n");
-                // pthread_mutex_lock(&lockHero);
+
                 heroHealth--;
                 player1.health_points--;
 
                 pthread_t thread;
                 pthread_create(&thread, NULL, &playerTakeDmgAnimation, NULL);
-                // pthread_mutex_unlock(&lockHero);
 
-                pthread_mutex_lock(&Coords[lockIdx].lock);
                 flagTrapActivated = 1;
                 flagTreasurePicked = 0;
                 MAP[Hero.positionX][Hero.positionY].hasTrap = 0;
                 MAP[Hero.positionX][Hero.positionY].hadTrap = 1;
-                pthread_mutex_unlock(&Coords[lockIdx].lock);
+
                 chestPlayerPosX = Hero.positionY * ROOM_SIZE;
                 chestPlayerPosY = Hero.positionX * ROOM_SIZE;
             }
@@ -681,54 +644,48 @@ void *heroActions()
                     pthread_cancel(monster->action);
                 }
 
-                // pthread_mutex_unlock(&lockMAP);
                 // unlock MAP
             }
-            // printf("You attacked the monster!\n");
+
             lastUserAction = IDLE;
             break;
 
         case MOVE_LEFT:
             if (Hero.positionY > 0 && MAP[Hero.positionX][Hero.positionY - 1].isVoid != 1 && isOtherMonsterThere(Hero.positionX, Hero.positionY - 1) == 0)
             {
-                // pthread_mutex_lock(&Coords[lockIdx].lock);
+
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionY--;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
         case MOVE_RIGHT:
             if (Hero.positionY < size - 1 && MAP[Hero.positionX][Hero.positionY + 1].isVoid != 1 && isOtherMonsterThere(Hero.positionX, Hero.positionY + 1) == 0)
             {
-                // pthread_mutex_lock(&Coords[lockIdx].lock);
+
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionY++;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
         case MOVE_UP:
             if (Hero.positionX > 0 && MAP[Hero.positionX - 1][Hero.positionY].isVoid != 1 && isOtherMonsterThere(Hero.positionX - 1, Hero.positionY) == 0)
             {
-                // pthread_mutex_lock(&Coords[lockIdx].lock);
+
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionX--;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
         case MOVE_DOWN:
             if (Hero.positionX < size - 1 && MAP[Hero.positionX + 1][Hero.positionY].isVoid != 1 && isOtherMonsterThere(Hero.positionX + 1, Hero.positionY) == 0)
             {
-                // pthread_mutex_lock(&Coords[lockIdx].lock);
                 MAP[Hero.positionX][Hero.positionY].hasHero = 0;
                 Hero.positionX++;
                 MAP[Hero.positionX][Hero.positionY].hasHero = 1;
-                // pthread_mutex_unlock(&Coords[lockIdx].lock);
             }
             lastUserAction = IDLE;
             break;
@@ -740,7 +697,6 @@ void *heroActions()
 
         if (MAP[player1.hitbox.y / ROOM_SIZE][player1.hitbox.x / ROOM_SIZE].isEnd == 1)
         {
-            // printf("You found the exit!\n");
             hasWon = 1;
             pthread_exit(0);
         }
