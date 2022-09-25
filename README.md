@@ -11,8 +11,8 @@ Profesor: Rodolfo De Jesús Mora Zamora
 Estudiantes: 
 + Johan Calvo Vargas - 2020297388
 + Roy Vinicio Garcia Alvarado - 2020109283
-+ Chuculun
-+ Elias
++ Alejandro Bedoya Jiménez - 2020354241
++ Elías Castro Montero - 2020098930
 
 Semestre II 2022
 
