@@ -19,9 +19,9 @@ Semestre II 2022
 
 Este proyecto fue realizado sobre distribuciones basadas en Ubuntu, como ZorinOS y Linux Mint
 
-¿Como instalar las dependencias?
+# ¿Como instalar las dependencias?
 
-Instalar GCC: 
+## Instalar GCC: 
 -sudo apt update
 -sudo apt install build-essential
 
@@ -31,6 +31,6 @@ En este branch hay un archivo makefile.
 
 Los dos usos más importantes de este makefile son los comandos:
 
-make install_SDL2 : Instala todas las depencias gráficas 
++ make install_SDL2 : Instala todas las depencias gráficas 
 
-make : Compila y ejecuta el proyecto
++ make : Compila y ejecuta el proyecto
