@@ -22,8 +22,8 @@ Este proyecto fue realizado sobre distribuciones basadas en Ubuntu, como ZorinOS
 # ¿Como instalar las dependencias?
 
 ## Instalar GCC: 
--sudo apt update
--sudo apt install build-essential
++ sudo apt update
++ sudo apt install build-essential
 
 El branch principal que contiene el proyecto completamente funcional es el branch main.
 
