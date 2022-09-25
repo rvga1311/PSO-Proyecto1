@@ -14,33 +14,33 @@ int flagTreasurePicked = 0;
 int playerTakeDamage = 0;
 int playerAttackRat = 0;
 int heroHealth = 0;
-int heroAttack=0;
+int heroAttack = 0;
 int hasWon = 0;
 MONSTER *monsterArray;
 struct room *emptyRooms;
-  SDL_Renderer *rend;
-  SDL_Surface *surface;
-  TTF_Font *font;
-  char text[5];
+SDL_Renderer *rend;
+SDL_Surface *surface;
+TTF_Font *font;
+char text[5];
 
-  Mix_Music *backgroundMusic;
-  Mix_Chunk *openChestSound;
-  Mix_Chunk *playerTakeDmgSound;
-  Mix_Chunk *ratTakeDmgSound;
-  Mix_Chunk *winSound;
-  Mix_Chunk *loseSound;
+Mix_Music *backgroundMusic;
+Mix_Chunk *openChestSound;
+Mix_Chunk *playerTakeDmgSound;
+Mix_Chunk *ratTakeDmgSound;
+Mix_Chunk *winSound;
+Mix_Chunk *loseSound;
 
-  int chestPlayerPosX;
-  int chestPlayerPosY;
+int chestPlayerPosX;
+int chestPlayerPosY;
 
-  int gameStarted;
+int gameStarted;
 
-  roomCoord *Coords;
-  HEROE Hero;
-  MONSTER *monsterArray;
-  ROOM **MAP;
+roomCoord *Coords;
+HEROE Hero;
+MONSTER *monsterArray;
+ROOM **MAP;
 UserHeroAction lastUserAction = IDLE;
-  struct player player1;
+struct player player1;
 
 void *playerControlTime()
 {
