@@ -62,20 +62,20 @@ typedef struct MONSTERS
     pthread_t action;
 } MONSTER;
 
-roomCoord *Coords;
-HEROE Hero;
-MONSTER *monsterArray;
-ROOM **MAP;
-UserHeroAction lastUserAction;
+extern roomCoord *Coords;
+extern HEROE Hero;
+extern MONSTER *monsterArray;
+extern ROOM **MAP;
+extern UserHeroAction lastUserAction;
 
-int heroHealth;
-int heroAttack;
-int size;
-int hasWon;
-int flagTreasurePicked;
-int flagTrapActivated;
-int playerTakeDamage;
-int playerAttackRat;
+extern int heroHealth;
+extern int heroAttack;
+extern int size;
+extern int hasWon;
+extern int flagTreasurePicked;
+extern int flagTrapActivated;
+extern int playerTakeDamage;
+extern int playerAttackRat;
 
 int isNotVoid(int x, int y);
 int isOtherMonsterThere(int x, int y);

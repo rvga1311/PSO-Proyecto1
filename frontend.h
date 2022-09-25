@@ -11,22 +11,22 @@
 #define PLAYER_SIZE 30
 #define ICON_SIZE 50
 
-SDL_Renderer *rend;
-SDL_Surface *surface;
-TTF_Font *font;
-char text[5];
+extern SDL_Renderer *rend;
+extern SDL_Surface *surface;
+extern TTF_Font *font;
+extern char text[5];
 
-Mix_Music *backgroundMusic;
-Mix_Chunk *openChestSound;
-Mix_Chunk *playerTakeDmgSound;
-Mix_Chunk *ratTakeDmgSound;
-Mix_Chunk *winSound;
-Mix_Chunk *loseSound;
+extern Mix_Music *backgroundMusic;
+extern Mix_Chunk *openChestSound;
+extern Mix_Chunk *playerTakeDmgSound;
+extern Mix_Chunk *ratTakeDmgSound;
+extern Mix_Chunk *winSound;
+extern Mix_Chunk *loseSound;
 
-int chestPlayerPosX;
-int chestPlayerPosY;
+extern int chestPlayerPosX;
+extern int chestPlayerPosY;
 
-int gameStarted;
+extern int gameStarted;
 
 struct player
 {
@@ -40,7 +40,7 @@ struct player
     int health_points;
 };
 
-struct player player1;
+extern struct player player1;
 
 struct room
 {
@@ -51,8 +51,8 @@ struct room
     int i;
     int j;
 };
-struct room *rooms;
-struct room *emptyRooms;
+extern struct room *rooms;
+extern struct room *emptyRooms;
 void drawplayer();
 void renderMap(int size);
 int valid_move(int val[2], int size, int array[30][2]);

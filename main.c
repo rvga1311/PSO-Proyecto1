@@ -6,6 +6,41 @@ int close1;
 struct room *rooms;
 int flagDrawMap;
 int gameStarted = 0;
+ROOM **MAP;
+int size = 0;
+int difficulty;
+int flagTrapActivated = 0;
+int flagTreasurePicked = 0;
+int playerTakeDamage = 0;
+int playerAttackRat = 0;
+int heroHealth = 0;
+int heroAttack=0;
+int hasWon = 0;
+MONSTER *monsterArray;
+struct room *emptyRooms;
+  SDL_Renderer *rend;
+  SDL_Surface *surface;
+  TTF_Font *font;
+  char text[5];
+
+  Mix_Music *backgroundMusic;
+  Mix_Chunk *openChestSound;
+  Mix_Chunk *playerTakeDmgSound;
+  Mix_Chunk *ratTakeDmgSound;
+  Mix_Chunk *winSound;
+  Mix_Chunk *loseSound;
+
+  int chestPlayerPosX;
+  int chestPlayerPosY;
+
+  int gameStarted;
+
+  roomCoord *Coords;
+  HEROE Hero;
+  MONSTER *monsterArray;
+  ROOM **MAP;
+UserHeroAction lastUserAction = IDLE;
+  struct player player1;
 
 void *playerControlTime()
 {
@@ -22,11 +57,6 @@ int main(int argc, char *argv[])
 
     // ==================== Escoger modo de juego ====================
     int difficulty;
-    size = 0;
-    flagTrapActivated = 0;
-    flagTreasurePicked = 0;
-    playerTakeDamage = 0;
-    playerAttackRat = 0;
     srand(time(0));
 
     while (size == 0)

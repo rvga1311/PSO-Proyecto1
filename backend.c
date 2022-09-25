@@ -1,7 +1,7 @@
 #include "backend.h"
 #include "frontend.h"
 
-UserHeroAction lastUserAction = IDLE;
+
 
 int getRoomLockIdx(int x, int y)
 {
