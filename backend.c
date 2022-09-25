@@ -1,8 +1,6 @@
 #include "backend.h"
 #include "frontend.h"
 
-
-
 int getRoomLockIdx(int x, int y)
 {
     for (int i = 0; i < size; i++)
