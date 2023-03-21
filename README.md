@@ -1,7 +1,8 @@
+# PSO-Proyecto1
 
 Videojuego desarrollado  en lenguaje C que consistía en un laberinto generado aleatoriamente en forma de tablero, donde el objetivo del jugador era encontrar la puerta. Mientras avanzaba por el mapa, podía encontrar y pelear con enemigos, activar trampas o encontrar recompensas. El enfoque principal del juego era manejar condiciones de carrera en regiones críticas de la memoria, las cuales se representaban con el movimiento aleatorio de los enemigos y evitando que hubiera dos enemigos en una misma casilla.
 ----
-# PSO-Proyecto1
+
 Principios de Sistemas Operativos - Proyecto 1
 
 ## Instituto Tecnologico de Costa Rica
